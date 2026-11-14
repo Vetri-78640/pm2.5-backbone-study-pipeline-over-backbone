@@ -4,7 +4,7 @@
 # Loads 5 seeds per finalist (42, 1337, 1, 2, 3), all trained with the same phase A
 # recipe, and scores them on the same 214 validation windows with the competition
 # metric. The measures and the decision rule were fixed before the seed runs
-# (`reports/results.md`, 5-seed extension).
+# (`results/README.md`, 5-seed extension).
 #
 # - **Uncertainty:** 5-seed ensemble gap with a 95% block bootstrap (blocks of 13
 #   consecutive windows = the 26 h a window spans, resampled within each month, 2,000
