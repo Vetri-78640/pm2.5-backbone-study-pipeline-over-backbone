@@ -144,7 +144,7 @@ uvx --python 3.12 --from kaggle==2.2.5 --with six kaggle kernels push -p noteboo
 
 Notes on the Kaggle stages:
 - **Builders overwrite.** The builders write into `notebooks/kaggle/` and would overwrite the notebooks that ran, so run them in a copy.
-- **Seed line.** Rebuilt round-one notebooks differ in one line: they hard-coded seed 42, and `study.py` now reads a top-level `SEED`.
+- **Rebuilt notebooks.** They differ from the committed ones in two ways. The round-one notebooks hard-coded seed 42, where `study.py` now reads a top-level `SEED` (three lines). And two comment lines in `src/` were reworded after the runs.
 - **Inputs.** Each notebook expects the competition data and the AFNO V4 run output (`imvetri0/afno-v4`) attached on Kaggle.
 
 ## Citation
