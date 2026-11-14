@@ -3,7 +3,7 @@
 #
 # {{SUMMARY}}
 #
-# **Why this notebook exists.** The team's model families (ConvLSTM, FMG-WACLU,
+# **Why this notebook exists.** The earlier model families (ConvLSTM, FMG-WACLU,
 # ResGRU-UNet, patch AFNO, AFNO V4) were built at different times with
 # different pipelines: split, episode masks, input channels, loss and
 # post-processing all changed along the way. Their leaderboard scores therefore
