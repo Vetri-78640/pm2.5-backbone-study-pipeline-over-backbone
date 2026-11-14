@@ -1,0 +1,28 @@
+[project]
+name = "pm25-backbone-study"
+version = "1.0.0"
+description = "Pipeline before backbone: a controlled comparison of Fourier neural operators and convolutional-recurrent networks for 16-hour PM2.5 forecasting over India"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Vetriselvan R" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "torch",
+    "matplotlib",
+    "statsmodels",
+    "pyyaml",
+    "lightgbm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "jupyter", "nbconvert"]
+
+[project.urls]
+Repository = "https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+markers = ["dryrun: synthetic-data dry runs of the Kaggle notebooks (slow; run with -m dryrun)"]
+addopts = "-m 'not dryrun'"
