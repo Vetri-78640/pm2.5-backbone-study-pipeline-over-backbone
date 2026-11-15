@@ -1,8 +1,8 @@
-# Pipeline before backbone
+# Pipeline Over Backbone
 
-**16-hour PM2.5 forecasting over India with Fourier neural operators and convolutional-recurrent networks**
+**A Controlled Study of Deep Networks for PM2.5 Forecasting over India**
 
-Vetriselvan R
+Vetriselvan R, Independent Researcher
 
 Paper: [`paper/paper.pdf`](paper/paper.pdf)
 
@@ -152,7 +152,7 @@ Notes on the Kaggle stages:
 ```bibtex
 @misc{vetriselvan2026pipeline,
   author       = {{Vetriselvan R}},
-  title        = {Pipeline before backbone: 16-hour {PM2.5} forecasting over {India} with {Fourier} neural operators and convolutional-recurrent networks},
+  title        = {Pipeline Over Backbone: A Controlled Study of Deep Networks for {PM2.5} Forecasting over {India}},
   year         = {2026},
   howpublished = {\url{https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone}}
 }

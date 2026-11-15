@@ -1,7 +1,7 @@
 [project]
 name = "pm25-backbone-study"
 version = "1.0.0"
-description = "Pipeline before backbone: a controlled comparison of Fourier neural operators and convolutional-recurrent networks for 16-hour PM2.5 forecasting over India"
+description = "Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting over India"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Vetriselvan R" }]

@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this code or its results, please cite it as below."
 type: software
-title: "Pipeline before backbone: 16-hour PM2.5 forecasting over India with Fourier neural operators and convolutional-recurrent networks"
+title: "Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting over India"
 authors:
   - given-names: "Vetriselvan"
     family-names: "R"
+    affiliation: "Independent Researcher"
 date-released: "2026-11-15"
 repository-code: "https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone"
 license: MIT
