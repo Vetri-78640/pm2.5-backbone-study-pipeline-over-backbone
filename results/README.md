@@ -37,7 +37,7 @@ A network is better than AFNO V4 only if it leads by more than 0.003 on validati
 
 ## Two and five seeds
 
-With two seeds, ensembles and calibration, ResGRU-UNet leads 0.9175 against 0.9131 on validation and 0.8898 against 0.8833 on test.
+With two seeds, the ensembles lead 0.9175 against 0.9131 on validation without calibration (0.9198 against 0.9143 with calibration, in sample), and 0.8898 against 0.8833 on test with calibration.
 
 | | AFNO V4 | ResGRU-UNet | Gap |
 |:--|--:|--:|--:|
@@ -123,7 +123,7 @@ Test score at each iteration ([`earlier_iterations.csv`](earlier_iterations.csv)
 | 2 | ResGRU-UNet | 0.8506 |
 | 3 | ResGRU-UNet, fine-tuned on episode peaks | 0.8594 |
 | 4 | ResGRU-UNet, quantile blends | 0.8648 |
-| 5 | AFNO with a SimVP translator, temporal hold-out | 0.8561 |
+| 5 | AFNO with a SimVP translator, blended with ResGRU-UNet; temporal hold-out | 0.8561 |
 | 6 | AFNO V3 | 0.8609 |
 | 7 | AFNO V4 | 0.8833 |
 | 8 | ResGRU-UNet in the V4 pipeline, five seeds, calibration | 0.8914 |
