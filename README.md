@@ -6,6 +6,10 @@ Vetriselvan R, Independent Researcher
 
 Paper: [`paper/paper.pdf`](paper/paper.pdf)
 
+![Gain in held-out test score from moving each network into the shared pipeline, against the gain from choosing ResGRU-UNet over AFNO V4](paper/figures/fig_teaser.png)
+
+*The pipeline matters more than the network. Coloured: the gain in held-out test score from moving each network from its own earlier pipeline into the shared pipeline (one seed, no ensemble or calibration; patch AFNO's gain includes a bug fix). Grey: the gain from choosing ResGRU-UNet over AFNO V4 inside the shared pipeline, at one seed, as the mean of five single seeds, and with five-seed ensembles and calibration.*
+
 ## Abstract
 
 We forecast PM2.5 over all of India 16 hours ahead, on a 140 x 124 grid of about 25 km cells, from 10 hours of WRF-Chem simulation fields, and ask how much of a deep forecaster's skill comes from its network and how much from the pipeline around it.
