@@ -1,0 +1,97 @@
+{
+ "model": "imvetri0/resgru-unet-pm25/PyTorch/default/1",
+ "model_version_checked": 1,
+ "version_2": {
+  "note": "Version 2 changed only README.md (the model card); weights and code unchanged.",
+  "changed": [
+   "README.md"
+  ],
+  "files": 14,
+  "unchanged_files": 13,
+  "sha256_check": "the 13 files other than README.md have the same SHA-256 in version 1 and version 2, both as downloaded from Kaggle",
+  "sha256_check_pass": true,
+  "sha256": {
+   "ep_mask_APRIL_16.npz": "09b18ba990bcff02b96f0c8e8a1b083cbb5f24723a712c4b7bad13afee285392",
+   "ep_mask_DEC_16.npz": "42481ec1f55d30922b3d075715c27b1d1ebefc608c2b5b0bda489ed2165dafbb",
+   "ep_mask_JULY_16.npz": "62c0d8ddbd42b417a76a12ce84f2618c5f0a67b793b30fffba4276835037d1c3",
+   "ep_mask_OCT_16.npz": "765f9f9cc118d1c6fd389c6ceed58baffa6d73ea52942b38cc60d5ad095fa736",
+   "horizon_scales.npy": "64c0a4cc0188c9563f8889dc0173493992d5018b23c29a515554cff0085fee7f",
+   "predict.py": "03ece6d5b4adbbbaa0142df14f30e9b71b2320fbdef9ae8ace7b0f7af84f7367",
+   "resgru_s1337_phaseA_best.pt": "e1655d8a006eaea5282a5240e40978024e7d19d4a1001bab9143b047d2257580",
+   "resgru_s1_phaseA_best.pt": "013936f15ee476b498ff288317b6195f927dfba7af0e765fe859f292f9b4491e",
+   "resgru_s2_phaseA_best.pt": "7ee70b9affcb289a3bd29950d2411eb7c47359920d257ce3119dffacbbc8315f",
+   "resgru_s3_phaseA_best.pt": "a6691d5e88920984be7405481d46608a86658fe9996a092af9d495bd90a7d0e8",
+   "resgru_s42_phaseA_best.pt": "f083d24af6d4b9059a7c85737f6bf1a07a61538d1ca17086c93a114d5811335a",
+   "stats.npz": "4cf974bba5655fcc6d6f5a2cae6e55365017488c28c3c00a695b350ecf2ec72e",
+   "study.py": "ae6f5ffabf78318f51ab2c999827e565d272060a2906c97fe7e44ecc0233a46e"
+  },
+  "readme_sha256": {
+   "1": "e6b711cbf93e3fede85d0d46a06fef88450e6a0fa679cd6c38f1b0c487286d29",
+   "2": "470a8f8eb1438ccdea7ba3b0c156b222b8cb191588ad19a4d07f4af46a898204"
+  }
+ },
+ "reference": "imvetri0/code4cleanair-backbone-study-5-seed-analysis",
+ "threshold": 0.001,
+ "networks": {
+  "42": {
+   "params": 7122113,
+   "epoch": 7,
+   "logged_val_score": 0.91579
+  },
+  "1337": {
+   "params": 7122113,
+   "epoch": 6,
+   "logged_val_score": 0.91523
+  },
+  "1": {
+   "params": 7122113,
+   "epoch": 7,
+   "logged_val_score": 0.91687
+  },
+  "2": {
+   "params": 7122113,
+   "epoch": 6,
+   "logged_val_score": 0.91784
+  },
+  "3": {
+   "params": 7122113,
+   "epoch": 7,
+   "logged_val_score": 0.91578
+  }
+ },
+ "calibrated": {
+  "command": "predict.py",
+  "reference": "preds_resgru_5seed_cal.npy",
+  "rel_diff": 0.0,
+  "max_abs_diff": 0.0,
+  "min": 0.0,
+  "max": 1573.143310546875,
+  "mean": 37.94271469116211
+ },
+ "uncalibrated": {
+  "command": "predict.py --no-cal",
+  "reference": "preds_resgru_5seed.npy",
+  "rel_diff": 0.0,
+  "max_abs_diff": 0.0,
+  "min": 0.0,
+  "max": 1507.088134765625,
+  "mean": 36.144065856933594
+ },
+ "checks": {
+  "seed 42: loads strictly into ResGRUUNet(20), 7,122,113 parameters": true,
+  "seed 1337: loads strictly into ResGRUUNet(20), 7,122,113 parameters": true,
+  "seed 1: loads strictly into ResGRUUNet(20), 7,122,113 parameters": true,
+  "seed 2: loads strictly into ResGRUUNet(20), 7,122,113 parameters": true,
+  "seed 3: loads strictly into ResGRUUNet(20), 7,122,113 parameters": true,
+  "predict.py output (218, 140, 124, 16), finite, non-negative": true,
+  "preds_resgru_5seed_cal.npy has shape (218, 140, 124, 16)": true,
+  "predict.py output equals preds_resgru_5seed_cal.npy (rel < 0.001)": true,
+  "predict.py --no-cal output (218, 140, 124, 16), finite, non-negative": true,
+  "preds_resgru_5seed.npy has shape (218, 140, 124, 16)": true,
+  "predict.py --no-cal output equals preds_resgru_5seed.npy (rel < 0.001)": true
+ },
+ "all_checks_pass": true,
+ "gpu": "Tesla T4",
+ "torch": "2.11.0+cu130",
+ "minutes": 3.5
+}
