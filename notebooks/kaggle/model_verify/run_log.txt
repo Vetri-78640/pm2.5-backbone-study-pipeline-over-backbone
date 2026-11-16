@@ -1,0 +1,66 @@
+[{"stream_name":"stderr","time":7.887689108,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":7.887739354,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":7.887743885,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":7.887746624,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":8.497266203,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":8.497317716,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":8.497326656,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":8.497330489,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":16.804923739,"data":"model    : /kaggle/input/models/imvetri0/resgru-unet-pm25/pytorch/default/1\n"}
+,{"stream_name":"stdout","time":16.804978346,"data":"reference: /kaggle/input/notebooks/imvetri0/code4cleanair-backbone-study-5-seed-analysis\n"}
+,{"stream_name":"stdout","time":16.804984776,"data":"files    : ['README.md', 'ep_mask_APRIL_16.npz', 'ep_mask_DEC_16.npz', 'ep_mask_JULY_16.npz', 'ep_mask_OCT_16.npz', 'horizon_scales.npy', 'predict.py', 'resgru_s1337_phaseA_best.pt', 'resgru_s1_phaseA_best.pt', 'resgru_s2_phaseA_best.pt', 'resgru_s3_phaseA_best.pt', 'resgru_s42_phaseA_best.pt', 'stats.npz', 'study.py']\n"}
+,{"stream_name":"stdout","time":16.804990485,"data":"torch 2.11.0+cu130 | GPU Tesla T4\n"}
+,{"stream_name":"stdout","time":17.209695411,"data":"device: cuda  backbone: resgru\n"}
+,{"stream_name":"stdout","time":17.502095284,"data":"seed 42: {'params': 7122113, 'epoch': 7, 'logged_val_score': 0.91579}\n"}
+,{"stream_name":"stdout","time":17.50212587,"data":"seed 1337: {'params': 7122113, 'epoch': 6, 'logged_val_score': 0.91523}\n"}
+,{"stream_name":"stdout","time":17.877415893,"data":"seed 1: {'params': 7122113, 'epoch': 7, 'logged_val_score': 0.91687}\n"}
+,{"stream_name":"stdout","time":17.877456095,"data":"seed 2: {'params': 7122113, 'epoch': 6, 'logged_val_score': 0.91784}\n"}
+,{"stream_name":"stdout","time":18.019396681,"data":"seed 3: {'params': 7122113, 'epoch': 7, 'logged_val_score': 0.91578}\n"}
+,{"stream_name":"stdout","time":139.874913618,"data":"device: cuda  backbone: resgru\n"}
+,{"stream_name":"stdout","time":139.874956242,"data":"  APRIL_16: T=715  ep_ratio=0.0208\n"}
+,{"stream_name":"stdout","time":139.874962212,"data":"  JULY_16: T=739  ep_ratio=0.0197\n"}
+,{"stream_name":"stdout","time":139.874967997,"data":"  OCT_16: T=739  ep_ratio=0.0170\n"}
+,{"stream_name":"stdout","time":139.874973052,"data":"  DEC_16: T=739  ep_ratio=0.0217\n"}
+,{"stream_name":"stdout","time":139.874977591,"data":"  test start-hour histogram: [16, 0, 19, 0, 13, 7, 10, 10, 8, 10, 9, 8, 8, 12, 5, 15, 9, 9, 9, 6, 12, 7, 12, 4]\n"}
+,{"stream_name":"stdout","time":139.874982112,"data":"seed 42: done\n"}
+,{"stream_name":"stdout","time":139.874986147,"data":"seed 1337: done\n"}
+,{"stream_name":"stdout","time":139.874990217,"data":"seed 1: done\n"}
+,{"stream_name":"stdout","time":139.874994216,"data":"seed 2: done\n"}
+,{"stream_name":"stdout","time":139.874998207,"data":"seed 3: done\n"}
+,{"stream_name":"stdout","time":139.875002519,"data":"preds.npy (218, 140, 124, 16), calibration on, range [0.00, 1573.14], mean 37.943\n"}
+,{"stream_name":"stdout","time":139.875006761,"data":" \n"}
+,{"stream_name":"stdout","time":220.674471179,"data":"device: cuda  backbone: resgru\n"}
+,{"stream_name":"stdout","time":220.674504393,"data":"  APRIL_16: T=715  ep_ratio=0.0208\n"}
+,{"stream_name":"stdout","time":220.674515513,"data":"  JULY_16: T=739  ep_ratio=0.0197\n"}
+,{"stream_name":"stdout","time":220.674518598,"data":"  OCT_16: T=739  ep_ratio=0.0170\n"}
+,{"stream_name":"stdout","time":220.674521514,"data":"  DEC_16: T=739  ep_ratio=0.0217\n"}
+,{"stream_name":"stdout","time":220.674524406,"data":"  test start-hour histogram: [16, 0, 19, 0, 13, 7, 10, 10, 8, 10, 9, 8, 8, 12, 5, 15, 9, 9, 9, 6, 12, 7, 12, 4]\n"}
+,{"stream_name":"stdout","time":220.674527478,"data":"seed 42: done\n"}
+,{"stream_name":"stdout","time":220.674530233,"data":"seed 1337: done\n"}
+,{"stream_name":"stdout","time":220.674532891,"data":"seed 1: done\n"}
+,{"stream_name":"stdout","time":220.674535608,"data":"seed 2: done\n"}
+,{"stream_name":"stdout","time":220.674538223,"data":"seed 3: done\n"}
+,{"stream_name":"stdout","time":220.674540901,"data":"preds.npy (218, 140, 124, 16), calibration off, range [0.00, 1507.09], mean 36.144\n"}
+,{"stream_name":"stdout","time":220.674543816,"data":" \n"}
+,{"stream_name":"stdout","time":222.602434143,"data":"calibrated {'command': 'predict.py', 'reference': 'preds_resgru_5seed_cal.npy', 'rel_diff': 0.0, 'max_abs_diff': 0.0, 'min': 0.0, 'max': 1573.143310546875, 'mean': 37.94271469116211}\n"}
+,{"stream_name":"stdout","time":223.843382909,"data":"uncalibrated {'command': 'predict.py --no-cal', 'reference': 'preds_resgru_5seed.npy', 'rel_diff': 0.0, 'max_abs_diff': 0.0, 'min': 0.0, 'max': 1507.088134765625, 'mean': 36.144065856933594}\n"}
+,{"stream_name":"stdout","time":223.843417563,"data":"PASS seed 42: loads strictly into ResGRUUNet(20), 7,122,113 parameters\n"}
+,{"stream_name":"stdout","time":223.843433305,"data":"PASS seed 1337: loads strictly into ResGRUUNet(20), 7,122,113 parameters\n"}
+,{"stream_name":"stdout","time":223.843438914,"data":"PASS seed 1: loads strictly into ResGRUUNet(20), 7,122,113 parameters\n"}
+,{"stream_name":"stdout","time":223.843443542,"data":"PASS seed 2: loads strictly into ResGRUUNet(20), 7,122,113 parameters\n"}
+,{"stream_name":"stdout","time":223.843448041,"data":"PASS seed 3: loads strictly into ResGRUUNet(20), 7,122,113 parameters\n"}
+,{"stream_name":"stdout","time":223.843452532,"data":"PASS predict.py output (218, 140, 124, 16), finite, non-negative\n"}
+,{"stream_name":"stdout","time":223.843456868,"data":"PASS preds_resgru_5seed_cal.npy has shape (218, 140, 124, 16)\n"}
+,{"stream_name":"stdout","time":223.843461344,"data":"PASS predict.py output equals preds_resgru_5seed_cal.npy (rel \u003c 0.001)\n"}
+,{"stream_name":"stdout","time":223.843466062,"data":"PASS predict.py --no-cal output (218, 140, 124, 16), finite, non-negative\n"}
+,{"stream_name":"stdout","time":223.843470689,"data":"PASS preds_resgru_5seed.npy has shape (218, 140, 124, 16)\n"}
+,{"stream_name":"stdout","time":223.843475335,"data":"PASS predict.py --no-cal output equals preds_resgru_5seed.npy (rel \u003c 0.001)\n"}
+,{"stream_name":"stderr","time":226.728823995,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":226.728855336,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":226.903811398,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":226.903838859,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":227.710596391,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":227.784984665,"data":"[NbConvertApp] Writing 13049 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":230.298766095,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":230.815676888,"data":"[NbConvertApp] Writing 301576 bytes to __results__.html\n"}
+]

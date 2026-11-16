@@ -1,0 +1,22 @@
+{
+  "id": "imvetri0/resgru-unet-pm25-verify",
+  "title": "ResGRU-UNet PM25 - Verify",
+  "code_file": "resgru-unet-pm25-verify.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "competition_sources": [
+    "anrf-aise-hack-phase-2-theme-2-pollution-forecasting-iitd"
+  ],
+  "kernel_sources": [
+    "imvetri0/code4cleanair-backbone-study-5-seed-analysis"
+  ],
+  "model_sources": [
+    "imvetri0/resgru-unet-pm25/PyTorch/default/1"
+  ]
+}
