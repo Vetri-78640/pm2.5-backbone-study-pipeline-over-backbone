@@ -57,12 +57,12 @@ Validation: 214 windows, 5.9 x 10<sup>7</sup> values. Test: 218 windows from 201
 | AFNO V4, five seeds + calibration | 7.76 | 20.90 | 0.855 | 0.9149 | 0.8848 |
 | ResGRU-UNet, five seeds | **6.32** | 18.04 | 0.892 | 0.9193 | 0.8838 |
 | ResGRU-UNet, five seeds + calibration | 7.12 | 19.71 | 0.871 | **0.9210** | **0.8914** |
-| ResGRU-UNet, five seeds + LightGBM correction | 6.42 | **17.75** | **0.895** | 0.9051 | |
+| ResGRU-UNet, five seeds + LightGBM correction | 6.42 | **17.75** | **0.895** | 0.9051 | 0.8608 |
 
 - **Five seeds:** the mean forecast of five networks trained with different seeds.
 - **Calibration:** one factor per lead hour, fitted on validation. The validation scores of these rows use factors fitted with the scored month left out.
-- **LightGBM correction:** out of fold (fitted on three months, applied to the fourth). It lowers RMSE but also the benchmark score, so it is reported and not adopted.
-- Blank cells were not scored on the test set.
+- **LightGBM correction:** out of fold (fitted on three months, applied to the fourth). It lowers RMSE but also the benchmark score, so it is reported and not adopted. Its test score was taken after that verdict, with the correction fitted on all four months.
+- **Seasonal naive** has no test score: for lead hours 1 to 14 the hour 24 h earlier lies before the ten input hours, which is all the test windows provide.
 
 Validation scores are higher than test scores, but validation ranks 25 network forecasts much as the test does (Spearman 0.93).
 
@@ -131,7 +131,9 @@ The same for every network:
 
 ### Benchmark score
 
-$$S = w_1\left(1-\frac{G}{2}\right) + w_2\,\frac{1+\rho}{2} + w_3\left(1-\frac{E}{2}\right)$$
+```math
+S = w_1\left(1-\frac{G}{2}\right) + w_2\,\frac{1+\rho}{2} + w_3\left(1-\frac{E}{2}\right)
+```
 
 - $G$ is the SMAPE over all cells and hours.
 - $E$ is the SMAPE over episode cells.
@@ -145,7 +147,7 @@ An hour is an episode when the cell's robust STL residual is above 3 times its s
 - **Three stages:** five networks on one seed; the two finalists with two seeds and the full recipe; then five seeds per finalist with a block bootstrap.
 - **Ablations:** four single-change ablations, with predictions written before the runs.
 - **Hybrid:** a LightGBM correction of the ensemble, tested by leaving one month out.
-- **Verification:** before training, every one of the 15 training runs re-evaluated the original AFNO V4 checkpoint in the shared code and reproduced its validation score to five decimals. The analysis stages carry 65 automated checks, and all pass.
+- **Verification:** before training, every one of the 15 training runs re-evaluated the original AFNO V4 checkpoint in the shared code and reproduced its validation score to five decimals. The analysis stages carry 68 automated checks, and all pass.
 
 Each network is ported from its original notebook, and the port is checked to give exactly the original's output for the same weights.
 
@@ -177,6 +179,10 @@ pip install -e ".[dev]"            # or: pip install -r requirements.txt
 ### Data
 
 Accept the competition rules on Kaggle, then follow [`data/README.md`](data/README.md). The data are not part of this repository.
+
+### Trained weights
+
+The five ResGRU-UNet networks of the main results, with the 16 calibration factors and the normalization statistics, are on Kaggle: [imvetri0/resgru-unet-pm25](https://www.kaggle.com/models/imvetri0/resgru-unet-pm25). With the challenge data attached, their five-seed mean with calibration reproduces exactly the forecast that scored 0.8914 on the test set (checked in `notebooks/kaggle/model_verify/`).
 
 ### Tests
 
@@ -227,6 +233,7 @@ uvx --python 3.12 --from kaggle==2.2.5 --with six kaggle kernels push -p noteboo
 | ablations: `ablations_a`, `ablations_b` | `build_ablations.py` |
 | regression metrics, baselines, ridge, maps, hybrid | `build_regression.py`, `build_baselines.py`, `build_ridge.py`, `build_maps.py`, `build_hybrid.py` |
 | persistence on the test set: `persistence` | none |
+| check of the published weights: `model_verify` | none |
 
 - **Builders overwrite.** The builders write into `notebooks/kaggle/` and would overwrite the notebooks that ran, so run them in a copy.
 - **Rebuilt notebooks.** They differ from the committed ones in two ways. The round-one notebooks hard-coded seed 42, where `study.py` now reads a top-level `SEED` (three lines). And two comment lines in `src/` were reworded after the runs.
