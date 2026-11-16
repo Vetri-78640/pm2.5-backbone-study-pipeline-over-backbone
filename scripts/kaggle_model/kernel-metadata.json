@@ -1,0 +1,17 @@
+{
+  "id": "imvetri0/resgru-unet-pm2-5-model-card",
+  "title": "ResGRU-UNet PM2.5 - Model Card",
+  "code_file": "resgru-unet-pm25-model-card.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": false,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": [
+    "imvetri0/resgru-unet-pm25/PyTorch/default/2"
+  ]
+}

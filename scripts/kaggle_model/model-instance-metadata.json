@@ -1,0 +1,16 @@
+{
+  "ownerSlug": "imvetri0",
+  "modelSlug": "resgru-unet-pm25",
+  "instanceSlug": "default",
+  "framework": "PyTorch",
+  "overview": "Five trained ResGRU-UNet networks (seeds 42, 1337, 1, 2, 3), 16 calibration factors, normalization statistics, episode masks and code for 16-hour PM2.5 forecasting over India.",
+  "usage": "# Model format\n\nPyTorch checkpoints (torch.save dicts) and NumPy arrays. Load a checkpoint with torch.load(path, weights_only=False)['model'] into ResGRUUNet(20) from study.py.\n\n# Training data\n\nHourly WRF-Chem fields over India for April, July, October and December 2016, from the ANRF AISEHack 2026 Phase 2 Theme 2 challenge data.\n\n# Model inputs\n\n(batch, 20, 10, 140, 124) and the last observed log(1 + PM2.5) frame (batch, 140, 124). README.md lists the 20 channels.\n\n# Model outputs\n\n(batch, 16, 140, 124) in log(1 + PM2.5); the forecast is max(exp(output) - 1, 0). predict.py writes (218, 140, 124, 16).\n\n# Model usage\n\nAttach this model and the challenge data (Kaggle provides it to the challenge's participants), then run predict.py. It averages the five networks and multiplies lead hour h by horizon_scales[h]; --no-cal skips the factors. Without the data, the networks still load and run on any input of the shapes above.\n\n# Fine-tuning\n\nInitialize ResGRUUNet(20) from any *_best.pt and continue training with study.py.\n",
+  "licenseName": "MIT",
+  "fineTunable": true,
+  "trainingData": [
+    "ANRF AISEHack 2026 Phase 2 Theme 2 - WRF-Chem simulation over India"
+  ],
+  "modelInstanceType": "BaseModel",
+  "baseModelInstanceId": 0,
+  "externalBaseModelUrl": ""
+}
