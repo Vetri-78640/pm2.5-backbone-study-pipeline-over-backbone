@@ -58,9 +58,17 @@ for s in S.SEEDS5:
             p.add_(0.01 * torch.randn_like(p))
     torch.save({'model': model.state_dict()}, os.path.join(ref, f'resgru_s{s}_phaseA_best.pt'))
 S.INPUT_ROOT = os.path.join(root, 'inputs')
+st0 = S.build_stats()
+ens0 = S.resgru_ensemble(S.PM25Test(st0, S.load_months(st0)[1]), test=True)[0].transpose(0, 2, 3, 1)
+os.makedirs(os.path.join(root, 'inputs', 'ana'))
+np.save(os.path.join(root, 'inputs', 'ana', 'preds_resgru_5seed.npy'), ens0)
 S.hybrid()
 r = json.load(open(os.path.join(C.WORK, 'hybrid.json')))
 check(r['all_checks_pass'], f'built-in checks pass: {r["checks"]}')
+post = r['verdict'] == 'no gain' and S.HYB_TEST_POST_HOC
+check(os.path.exists(os.path.join(C.WORK, 'preds_hybrid_posthoc.npy')) == post and r.get('test_post_hoc', False) == post
+      and (not post or 'zero correction on test reproduces preds_resgru_5seed.npy (rel < 1e-4)' in r['checks']),
+      'post-hoc test predictions written only for a "no gain" verdict, flagged in the record, with the zero-correction check')
 check(set(r['folds']) == set(C.MONTHS) and all(f['n_test_windows'] > 0 and f['n_fit_windows'] + f['n_test_windows'] == r['n_val_windows']
                                                 for f in r['folds'].values()), 'four folds, each holds out one whole month')
 wins = sum(f['hybrid']['score'] > f['ensemble']['score'] for f in r['folds'].values())
