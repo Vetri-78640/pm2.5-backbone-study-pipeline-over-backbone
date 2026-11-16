@@ -211,13 +211,24 @@
   "pm_h-6": 0.0029,
   "pm_h-5": 0.0019
  },
+ "test_mean_abs_correction_log": 0.06783,
+ "test_zero_correction": {
+  "rel_diff": 1.0720431475874648e-07,
+  "max_abs_diff": 0.00048828125
+ },
+ "test_post_hoc": true,
+ "test_post_hoc_date": "2026-11-16",
+ "test_post_hoc_note": "scored after the rule gave no gain; does not change the verdict",
  "checks": {
   "zero correction reproduces the ensemble score (within 1e-5)": true,
   "no fold is fitted on its own month": true,
   "every val window is predicted out of fold exactly once": true,
   "hybrid predictions finite and non-negative": true,
-  "ensemble score equals the 5-seed analysis (0.9193 within 1e-4)": true
+  "ensemble score equals the 5-seed analysis (0.9193 within 1e-4)": true,
+  "out-of-fold hybrid score equals the first run (0.9051 within 1e-4)": true,
+  "test predictions (218, 140, 124, 16), finite, non-negative": true,
+  "zero correction on test reproduces preds_resgru_5seed.npy (rel < 1e-4)": true
  },
  "all_checks_pass": true,
- "minutes": 10.9
+ "minutes": 16.7
 }

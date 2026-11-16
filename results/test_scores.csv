@@ -25,3 +25,4 @@ date_utc,description,public_score,private_score
 2026-11-08 03:31,"backbone study ablation H4: ResGRU-UNet without ConvGRU recurrence, seed 42, no calibration, val 0.9146",0.8944,0.8798
 2026-11-08 08:31,"backbone study baseline: persistence (last input hour repeated for 16 h), no model, val 0.8515",0.8024,0.7910
 2026-11-08 16:02,"backbone study baseline: ridge regression (20 channels last hour + PM history), val 0.8637",0.8071,0.7951
+2026-11-16 04:39,"post hoc: ResGRU-UNet 5-seed mean + LightGBM correction fitted on all 4 val months, no calibration, out-of-fold val 0.9051 (rule verdict: no gain)",0.8775,0.8608
