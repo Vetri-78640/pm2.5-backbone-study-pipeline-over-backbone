@@ -22,8 +22,15 @@
 # 4. Only if the verdict is "better": fit on all four months and write test predictions.
 # Limit: the val windows also picked each network's best epoch, so this tests the correction,
 # not the whole system on fully unseen data.
+#
+# Post hoc, added on 2026-11-16 after the verdict: with HYB_TEST_POST_HOC on, the all-month fit
+# is also scored on test (preds_hybrid_posthoc.npy) although the verdict is "no gain". The rule,
+# its date, the settings and the verdict are unchanged.
 
 # %%
+HYB_TEST_POST_HOC = True
+HYB_POST_HOC_NOTE = 'scored after the rule gave no gain; does not change the verdict'
+HYB_FIRST_RUN_OOF = 0.90511
 HYB_STRIDE = 4
 HYB_PARAMS = dict(objective='huber', alpha=0.5, n_estimators=300, learning_rate=0.05, num_leaves=31,
                   min_child_samples=500, subsample=0.8, subsample_freq=1, colsample_bytree=0.8,
@@ -146,6 +153,8 @@ def hybrid():
           'hybrid predictions finite and non-negative': bool(np.isfinite(oof).all() and oof.min() >= 0)}
     if C.IS_KAGGLE:
         ck['ensemble score equals the 5-seed analysis (0.9193 within 1e-4)'] = abs(pe['score'] - HYB_ENSEMBLE_REF) < 1e-4
+        if HYB_TEST_POST_HOC:
+            ck['out-of-fold hybrid score equals the first run (0.9051 within 1e-4)'] = abs(ph['score'] - HYB_FIRST_RUN_OOF) < 1e-4
     res = dict(rule='better only if the pooled out-of-fold score is higher and the hybrid wins in at least 3 of 4 held-out months',
                rule_date='2026-11-10', verdict='better' if better else 'no gain', months_won=int(wins),
                pooled=dict(ensemble=pe, hybrid=ph, score_gain=round(ph['score'] - pe['score'], 5)), folds=folds,
@@ -158,13 +167,26 @@ def hybrid():
     gain = model.booster_.feature_importance('gain')
     res['importance_gain_share_all_months_fit'] = {k: round(float(v), 4) for k, v in
                                                    sorted(zip(HYB_FEATS, gain / gain.sum()), key=lambda t: -t[1])}
-    if better:
+    if better or HYB_TEST_POST_HOC:
         test_ds = PM25Test(stats, static)
         _, tl, tsp, _, _ = resgru_ensemble(test_ds, test=True)
-        tp = np.stack([hybrid_apply(model, *test_ds[i], tl[i], tsp[i]) for i in range(len(test_ds))]).transpose(0, 2, 3, 1)
+        tp = np.stack([hybrid_apply(model, *test_ds[i], tl[i], tsp[i]) for i in range(len(test_ds))])
+        res['test_mean_abs_correction_log'] = round(float(np.abs(np.log1p(tp) - tl).mean()), 5)
+        tp = tp.transpose(0, 2, 3, 1)
         ck['test predictions (218, 140, 124, 16), finite, non-negative'] = bool(
             tp.shape == (C.N_TEST, C.H, C.W, C.T_OUT) and np.isfinite(tp).all() and tp.min() >= 0)
-        np.save(os.path.join(C.WORK, 'preds_hybrid.npy'), tp.astype(np.float32))
+        d = find_dir(INPUT_ROOT, ['preds_resgru_5seed.npy']) if INPUT_ROOT else None
+        if d:
+            ref = np.load(os.path.join(d, 'preds_resgru_5seed.npy'))
+            tz = np.stack([hybrid_apply(None, None, None, tl[i], None) for i in range(len(test_ds))]).transpose(0, 2, 3, 1)
+            rel = float(np.abs(tz - ref).mean() / np.abs(ref).mean())
+            res['test_zero_correction'] = dict(rel_diff=rel, max_abs_diff=float(np.abs(tz - ref).max()))
+            ck['zero correction on test reproduces preds_resgru_5seed.npy (rel < 1e-4)'] = rel < 1e-4
+            del ref, tz
+        np.save(os.path.join(C.WORK, 'preds_hybrid.npy' if better else 'preds_hybrid_posthoc.npy'), tp.astype(np.float32))
+        if not better:
+            res.update(test_post_hoc=True, test_post_hoc_date=time.strftime('%Y-%m-%d', time.gmtime()),
+                       test_post_hoc_note=HYB_POST_HOC_NOTE)
     res.update(checks=ck, all_checks_pass=all(ck.values()), minutes=round((time.time() - t0) / 60, 1))
     json.dump(res, open(os.path.join(C.WORK, 'hybrid.json'), 'w'), indent=1)
     print(f"  pooled: ensemble {pe['score']:.5f}  hybrid {ph['score']:.5f}  months won {wins}/4  verdict: {res['verdict']}")
