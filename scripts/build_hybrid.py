@@ -8,7 +8,8 @@ import build_regression as R
 TITLE = 'Code4CleanAir Backbone Study - Hybrid'
 SOURCES = [B.V4_KERNEL, 'imvetri0/code4cleanair-backbone-study-resgru-unet',
            'imvetri0/code4cleanair-backbone-study-final-round',
-           'imvetri0/code4cleanair-backbone-study-seeds-1-3-resgru']
+           'imvetri0/code4cleanair-backbone-study-seeds-1-3-resgru',
+           'imvetri0/code4cleanair-backbone-study-5-seed-analysis']
 
 
 def build():
