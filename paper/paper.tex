@@ -12,6 +12,7 @@
 \usetikzlibrary{positioning,arrows.meta,calc,fit,backgrounds}
 \usepackage{placeins}
 \usepackage{float}
+\usepackage{dblfloatfix}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{figures/}}
 \sisetup{group-minimum-digits=4}
@@ -121,7 +122,7 @@ where each $\hat{\mathbf{y}}_{t+h}$ is a $140\times124$ map of \PM{} in \ugm. Th
 \subsection{Data}
 The data are WRF-Chem simulation fields released by the organizers of the ANRF AISEHack 2026 challenge (Theme 2, IIT Delhi) \cite{aisehack2026}. Training covers four months of 2016, one per season (April, July, October and December; 715 or 739 hours each), on a Mercator grid of $140\times124$ cells from 7.06 to 38.00$^\circ$N and 67.79 to 97.93$^\circ$E, about 25~km apart (27.1~km east to west at the southern edge and 21.5~km at the northern edge). Each hour has 16 fields: surface \PM{} (the target), eight weather fields and seven emission fields (Table~\ref{tab:fields}).
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{The 16 hourly fields of the data (units as released) and their use}
 \label{tab:fields}
@@ -143,7 +144,7 @@ rain & mm & rain in the hour; input (log) \\
 \end{tabular}
 \end{table}
 
-The test set is 218 windows of 10 hours from 2017; its answers are hidden and scored by the organizers' evaluation server. The server reports the score on two parts of the test set, a public part and a private part. Throughout the paper, ``test'' means the private part. The public part, which gave feedback during the early development iterations (Appendix~\ref{sec:history}), is reported alongside it where it adds evidence (Table~\ref{tab:seeds} and Appendix~\ref{app:tests}).
+The test set is 218 windows of 10 hours from 2017; its answers are hidden and scored by the organizers' evaluation server. The server reports the score on two parts of the test set, a public part and a private part. Throughout the paper, ``test'' means the private part. The public part, which gave feedback during the early development iterations (Appendix~\ref{sec:history}), is reported alongside it where it adds evidence (Appendix~\ref{app:tests}, Tables~\ref{tab:seeds} and~\ref{tab:tests}).
 
 \subsection{Episodes}
 For each cell $i$, a robust STL decomposition \cite{cleveland1990} with a 24-hour period splits the month into trend, daily cycle and residual $r_{i,t}$. An hour is an episode when
@@ -165,7 +166,7 @@ The weights are not disclosed, so on validation we use $w_i=1/3$. Each term lies
 \label{sec:eda}
 Table~\ref{tab:eda} lists what the exploration of the four training months showed and what each finding changed in the pipeline; Appendix~\ref{app:eda} gives the details. Three findings shaped the method most. The concentration is right-skewed (skewness 5.1, but 0.13 after the log), so the networks work in $\log(1+y)$. The field is persistent at short lead and loses that memory over the horizon (the lag-1 autocorrelation of $\log(1+y)$ is 0.978, and the standard deviation of its change grows from 0.101 after one hour to 0.505 after 16), so the networks predict the change from persistence and later hours carry more weight in the loss. Finally, the wind moves \PM{} about 10 cells in 16 hours, so a forecast needs a receptive field of that size, not the whole map.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{What the data showed (training months) and what it changed}
 \label{tab:eda}
@@ -188,7 +189,7 @@ Emission fields are tiny (April maxima $8\times10^{-9}$ to $7\times10^{-6}$) & N
 \label{sec:method}
 Fig.~\ref{fig:overview} shows the pipeline. Each part below was added to fix a problem that an earlier iteration exposed (Appendix~\ref{sec:history}), and each is shared by all five networks.
 
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \begin{tikzpicture}[font=\footnotesize, node distance=3.6mm,
   b/.style={draw=cgray, rounded corners=2pt, align=center, minimum height=16mm, inner sep=3pt, text width=23mm, fill=cgray!5},
@@ -242,7 +243,7 @@ from centred differences. Earlier models used the same physics in other forms: C
 
 \textbf{Normalization.} \PM{} and rain are log-transformed; every channel is standardized per cell with training-period statistics, with a floor on the standard deviation and clipping at $\pm10$.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{The 20 input channels in four groups}
 \label{tab:features}
@@ -262,7 +263,7 @@ Static & 4 & latitude, longitude, cell \PM{} climatology, cell STL residual spre
 \label{sec:arch}
 Table~\ref{tab:models} lists the five networks, and Appendix~\ref{app:arch} gives their layers. All read the same 20 channels and all output the residual of Section~\ref{sec:theory}. Each was ported from its original code; with the original input width and the same weights, each port reproduces the original output exactly (for ConvLSTM, with its season input, which these data lack, set to identity). A bug in the original patch AFNO, which dropped the imaginary half of every filtered spectrum, was fixed. Fig.~\ref{fig:arch} shows the two finalists.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{The five networks (study versions, 20 input channels)}
 \label{tab:models}
@@ -280,7 +281,7 @@ ConvLSTM & 19.0M & ConvLSTM over the inputs, spectral block, wind-shift advectio
 \end{tabular}
 \end{table}
 
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \begin{tikzpicture}[font=\footnotesize, node distance=4mm,
   b/.style={draw=cgray, rounded corners=2pt, align=center, minimum height=10mm, inner sep=3pt, text width=24mm},
@@ -388,7 +389,7 @@ Every training run and every main analysis was first run on synthetic data on a 
 \subsection{Finding 1: The Pipeline Matters More Than the Network}
 Table~\ref{tab:samepipe} shows the same network in its own earlier pipeline and in the shared pipeline: each of the three networks whose original runs are known gained 0.025 to 0.031 on the test set. Moving ResGRU-UNet from iteration 2 into the V4 pipeline raised its test score from 0.8506 to 0.8798 (+0.0292, one seed, no calibration). At the same setting the gap to AFNO V4 is +0.0036, or +0.0045 averaged over five seeds. The pipeline therefore moved the score 6 to 8 times more than the choice between the two best networks (4.4 times against the full-recipe gap of +0.0066).
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{The same network in its own pipeline and in the V4 pipeline (held-out test; V4 pipeline: seed 42, no ensemble or calibration). Each gain bundles every pipeline change, and for patch AFNO also its bug fix}
 \label{tab:samepipe}
@@ -405,7 +406,7 @@ patch AFNO & 0.8218 & 0.8530 & +0.0312 \\
 
 The pipeline gain bundles several changes that we did not separate for these three networks. For AFNO V4 itself, the last pipeline step can be split, because its intermediate forecasts were scored (Table~\ref{tab:v4steps}). Its test gain over V3 (+0.0224) splits into +0.0147 from the per-seed changes (physics channels, multiscale block, lead-hour weights), +0.0024 from the two-seed ensemble and +0.0054 from calibration, or 65\%, 10\% and 24\%. Even the smallest of these steps is close to the one-seed gap between the two best networks.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{What V4's pipeline steps added (held-out test). The per-seed row is the mean of AFNO V4 seeds 42 and 1337; gains are rounded to four decimals}
 \label{tab:v4steps}
@@ -425,7 +426,7 @@ V3 (one model, no blend) & 0.8609 & \\
 \label{sec:finding2}
 Table~\ref{tab:round1} gives round one with the three terms of the score. ResGRU-UNet leads on all three terms, and validation and test order the five networks the same way. Under the rule, ResGRU-UNet is better than AFNO V4 (+0.0048 validation, +0.0036 test), FMG-WACLU ties with it, and patch AFNO and ConvLSTM are worse. The terms show where the weaker networks lose: patch AFNO's global SMAPE is better than AFNO V4's, but its episode terms are much worse, and ConvLSTM has the worst episode SMAPE of all.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Round one: seed 42, same pipeline, no ensemble or calibration. Ep.: best epoch; $G$, $E$, $\rho$ and $S$ on validation}
 \label{tab:round1}
@@ -445,7 +446,7 @@ ConvLSTM & 7 & 0.2169 & 0.3282 & 0.9120 & 0.8945 & 0.8452 \\
 
 Table~\ref{tab:twoseed} gives the second stage. With two seeds ResGRU-UNet again leads: the two-seed means score 0.9175 against 0.9131 on validation and 0.8817 against 0.8779 on test, and with calibration 0.9198 against 0.9143 on validation (in sample) and 0.8898 against 0.8833 on test.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Two seeds (42 and 1337) per finalist. Calibration on validation is in sample}
 \label{tab:twoseed}
@@ -463,9 +464,9 @@ Gap & +0.00436 & +0.00552 & +0.0038 & +0.0065 \\
 \end{tabular}
 \end{table}
 
-Five seeds give Table~\ref{tab:fiveseed}, Table~\ref{tab:seeds} and Fig.~\ref{fig:seeds}. The validation gap between the five-seed means is $+0.00479$, with a 95\% block-bootstrap interval of $[+0.00383, +0.00578]$; every one of the 2{,}000 resamples favours ResGRU-UNet. The gap between the single-seed means is $+0.00484$ $[+0.00386, +0.00584]$. Every ResGRU-UNet seed beats every AFNO V4 seed on validation, on the private test and on the public test (25 of 25 pairs each); its worst seed (0.8788 test) beats AFNO V4's best (0.8767), and on the public part its worst (0.8924) beats AFNO V4's best (0.8882). The exact rank test of Section~\ref{sec:stats} gives $p\approx0.004$ on each of the three.
+Five seeds give Table~\ref{tab:fiveseed} and Fig.~\ref{fig:seeds}; Table~\ref{tab:seeds} in Appendix~\ref{app:supp} lists every seed. The validation gap between the five-seed means is $+0.00479$, with a 95\% block-bootstrap interval of $[+0.00383, +0.00578]$; every one of the 2{,}000 resamples favours ResGRU-UNet. The gap between the single-seed means is $+0.00484$ $[+0.00386, +0.00584]$. Every ResGRU-UNet seed beats every AFNO V4 seed on validation, on the private test and on the public test (25 of 25 pairs each); its worst seed (0.8788 test) beats AFNO V4's best (0.8767), and on the public part its worst (0.8924) beats AFNO V4's best (0.8882). The exact rank test of Section~\ref{sec:stats} gives $p\approx0.004$ on each of the three.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Five seeds per finalist. Calibration is fitted on validation}
 \label{tab:fiveseed}
@@ -486,31 +487,7 @@ Single seeds, test: mean & 0.87540 & 0.87994 & +0.00454 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[!t]
-\centering
-\caption{Every seed of each finalist: validation, the private test (reported as test throughout) and the public test. No ensemble or calibration}
-\label{tab:seeds}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-Network & Seed & Validation & Test & Public test \\
-\midrule
-AFNO V4 & 42 & 0.91103 & 0.8762 & 0.8878 \\
-AFNO V4 & 1337 & 0.91141 & 0.8749 & 0.8882 \\
-AFNO V4 & 1 & 0.91178 & 0.8758 & 0.8881 \\
-AFNO V4 & 2 & 0.91227 & 0.8767 & 0.8880 \\
-AFNO V4 & 3 & 0.91080 & 0.8734 & 0.8876 \\
-\midrule
-ResGRU-UNet & 42 & 0.91579 & 0.8798 & 0.8924 \\
-ResGRU-UNet & 1337 & 0.91523 & 0.8788 & 0.8930 \\
-ResGRU-UNet & 1 & 0.91687 & 0.8796 & 0.8956 \\
-ResGRU-UNet & 2 & 0.91784 & 0.8805 & 0.8951 \\
-ResGRU-UNet & 3 & 0.91579 & 0.8810 & 0.8957 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_seed_spread.pdf}
 \caption{Every seed of each finalist. The two families do not overlap on validation or on the held-out test.}
@@ -519,7 +496,7 @@ ResGRU-UNet & 3 & 0.91579 & 0.8810 & 0.8957 \\
 
 \textbf{Agreement of validation and test.} Fig.~\ref{fig:valtest} plots validation against test for the 25 network forecasts that have both: the five round-one networks, the other eight single seeds, the eight ensembles with and without calibration, and the four ablations. The Pearson correlation is 0.96 and the Spearman rank correlation 0.93; with persistence and ridge added, the Pearson correlation is 0.99 over 27 forecasts. Validation is optimistic in level (it chose each run's best epoch and fitted the calibration) but it orders the forecasts much as the test does, which is what the decision rules require. On the test inputs, the two five-seed ensembles make similar forecasts: their log forecasts correlate at 0.996 and differ by 0.079 on average, about 8\%.
 
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_val_test.pdf}
 \caption{Validation against held-out test for the 25 network forecasts that have both scores. Filled circles: single seeds; diamonds: ensembles, with and without calibration; open circles: single-change ablations.}
@@ -529,7 +506,7 @@ ResGRU-UNet & 3 & 0.91579 & 0.8810 & 0.8957 \\
 \subsection{Regression Metrics and Lead Time}
 Table~\ref{tab:regression} gives MAE, RMSE, $R^2$ and skill on validation for every model. Every network beats all three baselines on every metric. The ResGRU-UNet ensemble has 31.8\% lower RMSE and 39.4\% lower MAE than persistence. Ridge improves on persistence on validation (score 0.8637) but barely on the test set (0.7951 against 0.7910). Appendix~\ref{app:regfull} adds every seed, every ensemble, the ablations and the same metrics in log space.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Validation regression metrics (MAE, RMSE in \ugm) over all $5.9\times10^7$ values, with the benchmark score $S$. Skill: lower RMSE than persistence. Calibration rows: factors fitted with one month left out. The hybrid row is out of fold}
 \label{tab:regression}
@@ -559,35 +536,18 @@ ResGRU-UNet & \textbf{6.32} & 18.04 & 0.892 & 31.8\% & 0.9193 \\
 \end{tabular}
 \end{table}
 
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \includegraphics[width=\textwidth]{fig_lead_metrics.pdf}
 \caption{Validation MAE, RMSE and $R^2$ by lead hour (five-seed means, no calibration). ResGRU-UNet is best at every hour. Seasonal naive overtakes persistence from hour 8, when the daily cycle outweighs the last observed state.}
 \label{fig:lead}
 \end{figure*}
 
-Fig.~\ref{fig:lead} and Table~\ref{tab:lead} show the error growing with lead time: ResGRU-UNet's $R^2$ falls from 0.992 at hour 1 to 0.830 at hour 16, and persistence's from 0.985 to 0.674. Seasonal naive is flat over the horizon and overtakes persistence on all three metrics from hour 8. Fig.~\ref{fig:terms} in Appendix~\ref{app:extra} splits the score into its three terms. ResGRU-UNet is better on all three at every hour; the score gap grows from $+0.0018$ at hour 1 to about $+0.006$ at hours 10 to 15. Of the five-seed gap, 56\% comes from global SMAPE, 23\% from episode SMAPE and 22\% from episode correlation.
-
-\begin{table*}[!t]
-\centering
-\caption{Validation MAE / RMSE (\ugm) / $R^2$ at five lead hours (no calibration)}
-\label{tab:lead}
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-Model & $h=1$ & $h=4$ & $h=8$ & $h=12$ & $h=16$ \\
-\midrule
-Persistence & 2.14 / 6.82 / 0.985 & 7.32 / 19.49 / 0.875 & 11.63 / 28.19 / 0.735 & 13.58 / 31.53 / 0.667 & 13.57 / 31.41 / 0.674 \\
-Seasonal naive & 11.78 / 27.42 / 0.751 & 11.72 / 27.26 / 0.755 & 11.55 / 26.84 / 0.760 & 11.38 / 26.40 / 0.767 & 11.31 / 26.22 / 0.773 \\
-Ridge & 1.58 / 5.59 / 0.990 & 6.60 / 17.07 / 0.904 & 9.67 / 23.20 / 0.821 & 10.50 / 24.71 / 0.796 & 11.00 / 25.67 / 0.782 \\
-AFNO V4, 5 seeds & 1.49 / 5.46 / 0.990 & 4.77 / 14.63 / 0.929 & 7.62 / 20.75 / 0.857 & 9.04 / 22.69 / 0.828 & 9.76 / 23.66 / 0.815 \\
-ResGRU-UNet, 5 seeds & 1.31 / 4.92 / 0.992 & 4.29 / 13.26 / 0.942 & 6.84 / 18.93 / 0.881 & 8.18 / 21.14 / 0.850 & 9.07 / 22.68 / 0.830 \\
-\bottomrule
-\end{tabular}
-\end{table*}
+Fig.~\ref{fig:lead} and Table~\ref{tab:lead} in Appendix~\ref{app:supp} show the error growing with lead time: ResGRU-UNet's $R^2$ falls from 0.992 at hour 1 to 0.830 at hour 16, and persistence's from 0.985 to 0.674. Seasonal naive is flat over the horizon and overtakes persistence on all three metrics from hour 8. Fig.~\ref{fig:terms} in Appendix~\ref{app:extra} splits the score into its three terms. ResGRU-UNet is better on all three at every hour; the score gap grows from $+0.0018$ at hour 1 to about $+0.006$ at hours 10 to 15. Of the five-seed gap, 56\% comes from global SMAPE, 23\% from episode SMAPE and 22\% from episode correlation.
 
 \textbf{Episode cells.} Table~\ref{tab:episode} splits the errors between the 1.8\% of values that are episodes and the rest. On episode cells every network is far better than every baseline: the ResGRU-UNet ensemble has an episode MAE of 15.68 against 27.63 for persistence. Ridge, which beats persistence overall, is worse than persistence on episode cells (MAE 30.93, $R^2$ 0.589 against 0.640): a linear model shared by all cells pulls the forecast toward typical values. Calibration shows the trade-off of Section~\ref{sec:theory} directly. It lowers the episode MAE of the ResGRU-UNet ensemble by 6.6\% (15.68 to 14.65) and raises the MAE on the other cells by 13.6\% (6.15 to 6.98); for AFNO V4 the changes are $-2.9$\% and $+11.7$\%.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Validation errors on episode cells ($n=1{,}082{,}178$) and on all other cells ($n=58{,}358{,}462$); MAE, RMSE in \ugm. Calibration: one month left out}
 \label{tab:episode}
@@ -613,7 +573,7 @@ ResGRU-UNet, 5 seeds & 15.68 & 40.23 & 0.839 & 6.15 & 17.37 & 0.893 \\
 \label{sec:finding3}
 ResGRU-UNet is first on all six measures in Fig.~\ref{fig:rank}, but the other four reorder. AFNO V4 is second on the benchmark score yet last on MAE, RMSE and $R^2$; ConvLSTM is last on the score yet second on RMSE and $R^2$. The score is relative and focused on episodes, while raw-scale MAE, RMSE and $R^2$ are dominated by high concentrations. A single metric would have given a misleading ranking of the weaker networks.
 
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_rank_by_metric.pdf}
 \caption{Round-one ranks (seed 42) under six measures. Only ResGRU-UNet keeps its rank under every measure.}
@@ -622,65 +582,22 @@ ResGRU-UNet is first on all six measures in Fig.~\ref{fig:rank}, but the other f
 
 Calibration raises the score but worsens MAE, RMSE and $R^2$ for both finalists (Fig.~\ref{fig:calib}): the ResGRU-UNet ensemble moves from MAE 6.32 to 7.12 while its score rises from 0.9193 to 0.9210. The factors push forecasts up, which the episode terms reward and absolute and squared errors penalize. The uncalibrated mean is the better model for MAE, RMSE and $R^2$; the calibrated one is better for the benchmark score. The ML + DL hybrid of Section~\ref{sec:hybrid} shows the same trade-off in reverse.
 
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_calibration.pdf}
 \caption{Calibration moves both finalists to a higher score and a higher MAE (validation; in sample for 2 seeds, leave one month out for 5 seeds).}
 \label{fig:calib}
 \end{figure}
 
-Fig.~\ref{fig:calibscales} shows the fitted factors. They rise with lead time for both finalists and for every choice of fitting months, and they are larger for ResGRU-UNet (1.01 at hour 1 to 1.10 from hour 14) than for AFNO V4 (1.00 to 1.08). Leaving the scored month out costs little: 0.9210 against 0.9215 in sample for ResGRU-UNet and 0.9149 against 0.9158 for AFNO V4. The factors fitted without October are the largest, that is, October itself favours the smallest shift.
+Fig.~\ref{fig:calibscales} in Appendix~\ref{app:supp} shows the fitted factors. They rise with lead time for both finalists and for every choice of fitting months, and they are larger for ResGRU-UNet (1.01 at hour 1 to 1.10 from hour 14) than for AFNO V4 (1.00 to 1.08). Leaving the scored month out costs little: 0.9210 against 0.9215 in sample for ResGRU-UNet and 0.9149 against 0.9158 for AFNO V4. The factors fitted without October are the largest, that is, October itself favours the smallest shift.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{fig_calib_scales.pdf}
-\caption{Fitted calibration factors $c_h$ of the five-seed ensembles by lead hour: fitted on all four validation months (thick) and with one month left out (thin).}
-\label{fig:calibscales}
-\end{figure}
-
+\FloatBarrier
 \section{Analysis}
 \label{sec:analysis}
 \subsection{Where ResGRU-UNet Wins}
-It is ahead in all four validation months (Table~\ref{tab:months}), lower in SMAPE in five of six concentration bins and equal in the highest (Table~\ref{tab:bins}), and lower in every decile of cells ranked by their mean concentration (Table~\ref{tab:deciles} in Appendix~\ref{app:extra}). Both models under-predict episode cells (mean log bias $-0.160$ for AFNO V4 and $-0.157$ for ResGRU-UNet) and over-predict the other cells ($+0.084$ and $+0.062$), most of all in the cleanest bin (Fig.~\ref{fig:where}, middle). ResGRU-UNet's smaller over-prediction outside episodes is consistent with its larger gain in the global term.
+It is ahead in all four validation months (Table~\ref{tab:months} in Appendix~\ref{app:supp}), lower in SMAPE in five of six concentration bins and equal in the highest (Table~\ref{tab:bins} in Appendix~\ref{app:supp}), and lower in every decile of cells ranked by their mean concentration (Table~\ref{tab:deciles} in Appendix~\ref{app:extra}). Both models under-predict episode cells (mean log bias $-0.160$ for AFNO V4 and $-0.157$ for ResGRU-UNet) and over-predict the other cells ($+0.084$ and $+0.062$), most of all in the cleanest bin (Fig.~\ref{fig:where}, middle). ResGRU-UNet's smaller over-prediction outside episodes is consistent with its larger gain in the global term.
 
-\begin{table}[!t]
-\centering
-\caption{Five-seed ensemble scores by validation month (no calibration)}
-\label{tab:months}
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Month & AFNO V4 & ResGRU-UNet & Gap \\
-\midrule
-April & 0.9097 & 0.9162 & +0.0064 \\
-July & 0.9056 & 0.9091 & +0.0035 \\
-October & 0.9233 & 0.9271 & +0.0038 \\
-December & 0.9194 & 0.9249 & +0.0055 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[!t]
-\centering
-\caption{Five-seed ensembles by true concentration (\ugm): share of values, mean SMAPE and mean log bias (positive: too high)}
-\label{tab:bins}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lrcccc@{}}
-\toprule
- & & \multicolumn{2}{c}{SMAPE} & \multicolumn{2}{c}{Log bias} \\
-\cmidrule(lr){3-4}\cmidrule(l){5-6}
-Bin & Share & AFNO & ResGRU & AFNO & ResGRU \\
-\midrule
-0 to 10 & 36.5\% & 0.261 & 0.241 & +0.103 & +0.085 \\
-10 to 25 & 26.1\% & 0.181 & 0.167 & +0.071 & +0.050 \\
-25 to 50 & 16.6\% & 0.177 & 0.161 & +0.073 & +0.048 \\
-50 to 100 & 11.8\% & 0.158 & 0.144 & +0.070 & +0.046 \\
-100 to 200 & 6.5\% & 0.160 & 0.149 & +0.046 & +0.021 \\
-above 200 & 2.5\% & 0.147 & 0.147 & $-$0.009 & $-$0.026 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \includegraphics[width=\textwidth]{fig_where.pdf}
 \caption{Five-seed means on validation. Left: mean SMAPE by true concentration. Middle: mean log bias (positive: too high). Right: score gap by month (ResGRU-UNet minus AFNO V4).}
@@ -689,7 +606,7 @@ above 200 & 2.5\% & 0.147 & 0.147 & $-$0.009 & $-$0.026 \\
 
 Fig.~\ref{fig:maps} maps the time-averaged errors. \PM{} and the errors of persistence concentrate over the Indo-Gangetic Plain and the eastern coal belt; ResGRU-UNet removes much of that error. It has lower MAE than AFNO V4 in 90.5\% of cells and lower SMAPE in 94.7\% (Fig.~\ref{fig:smape} in Appendix~\ref{app:extra}), with the largest gains over the Indo-Gangetic Plain and central India. The median per-cell $R^2$ over time is 0.872 for ResGRU-UNet, 0.846 for AFNO V4 and 0.694 for persistence; it is lowest north of 32$^\circ$N (median 0.764), where the air is cleanest (13.8 against 42.3~\ugm{} south of it). Fig.~\ref{fig:case} in the same appendix shows the window with the most episode cells.
 
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \includegraphics[width=\textwidth]{fig_maps.pdf}
 \caption{Time-averaged validation maps. (a) Mean \PM. (b) Share of hours that are episodes. (c, d) MAE of persistence and of the ResGRU-UNet five-seed mean. (e) MAE difference, ResGRU-UNet minus AFNO V4. (f) $R^2$ of each cell's time series, ResGRU-UNet.}
@@ -707,7 +624,7 @@ We tested four hypotheses, each with one change to one finalist and one seed (Ta
 \end{itemize}
 None passes the threshold at one seed. H1 (skips that fuse all 10 hours, started equal to V4's fusion) moves AFNO V4 about a quarter of the way toward ResGRU-UNet. Replacing ResGRU-UNet's ConvGRU with per-lead convolution blocks of the same size costs about a third of the gap, yet it still beats every AFNO V4 seed: the recurrence is therefore not required for the win, although its contribution remains unresolved. Padding also strengthens the soft threshold, because the orthonormal FFT spreads the same energy over four times as many coefficients; H3 suggests this matters little.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Single-change ablations (seed 42). $d$: validation change from the family's five-seed mean; $d/G$: share of the 0.00484 gap. Threshold 0.002 (AFNO V4) and 0.00208 (ResGRU-UNet)}
 \label{tab:ablations}
@@ -724,39 +641,14 @@ H4 & ResGRU-UNet, ConvGRU replaced & $-0.00174$ & $-0.36$ & 0.8798 \\
 \end{tabular}
 \end{table}
 
-\textbf{A generalization gap.} The training curves (Fig.~\ref{fig:curves} and Table~\ref{tab:curves}) show a pattern none of the AFNO changes altered. Every AFNO run reaches a lower training loss than ResGRU-UNet (0.053 to 0.054 against 0.064 to 0.068) but a higher validation loss: at a training loss of 0.09, its validation loss is 6.8\% higher on average. Its score peaks at epoch 4 or 5 and then falls by 0.009 to 0.010; ResGRU-UNet peaks at epoch 6 or 7 and falls by 0.003 to 0.005. Without its recurrence, ResGRU-UNet moves about 41\% of the way toward AFNO's validation loss. These observations are exploratory, but they suggest AFNO V4 fits the training months more and transfers less to new months. Its global, wrap-around spectral mixing, per-hour encoder and translator remain candidates for the cause.
+\textbf{A generalization gap.} The training curves (Fig.~\ref{fig:curves}; Table~\ref{tab:curves} in Appendix~\ref{app:supp}) show a pattern none of the AFNO changes altered. Every AFNO run reaches a lower training loss than ResGRU-UNet (0.053 to 0.054 against 0.064 to 0.068) but a higher validation loss: at a training loss of 0.09, its validation loss is 6.8\% higher on average. Its score peaks at epoch 4 or 5 and then falls by 0.009 to 0.010; ResGRU-UNet peaks at epoch 6 or 7 and falls by 0.003 to 0.005. Without its recurrence, ResGRU-UNet moves about 41\% of the way toward AFNO's validation loss. These observations are exploratory, but they suggest AFNO V4 fits the training months more and transfers less to new months. Its global, wrap-around spectral mixing, per-hour encoder and translator remain candidates for the cause.
 
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_training_curves.pdf}
 \caption{Training curves of the 12 ResGRU-UNet and AFNO V4 runs with per-epoch logs (AFNO V4 seeds 1 to 3, ResGRU-UNet seeds 42, 1337 and 1 to 3, and the four ablation variants): (a) validation score per epoch; (b) validation loss against training loss, with a dotted line at a training loss of 0.09.}
 \label{fig:curves}
 \end{figure}
-
-\begin{table}[!t]
-\centering
-\caption{Training curves of the 12 logged runs (ResGRU: ResGRU-UNet; s: seed): best epoch and its validation score, the score at the last epoch (16), the drop, the lowest training loss, and the validation loss at a training loss of 0.09 (interpolated)}
-\label{tab:curves}
-\setlength{\tabcolsep}{2.4pt}
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
-Run & Peak & $S$ peak & $S$ last & Drop & Min tr. & Val@0.09 \\
-\midrule
-AFNO V4, s1 & 4 & 0.91178 & 0.90260 & 0.0092 & 0.0537 & 0.1247 \\
-AFNO V4, s2 & 4 & 0.91227 & 0.90222 & 0.0101 & 0.0536 & 0.1241 \\
-AFNO V4, s3 & 5 & 0.91080 & 0.90185 & 0.0090 & 0.0539 & 0.1257 \\
-ResGRU, s42 & 7 & 0.91579 & 0.91237 & 0.0034 & 0.0660 & 0.1178 \\
-ResGRU, s1337 & 6 & 0.91523 & 0.91222 & 0.0030 & 0.0646 & 0.1174 \\
-ResGRU, s1 & 7 & 0.91687 & 0.91273 & 0.0041 & 0.0679 & 0.1168 \\
-ResGRU, s2 & 6 & 0.91784 & 0.91337 & 0.0045 & 0.0635 & 0.1146 \\
-ResGRU, s3 & 7 & 0.91578 & 0.91294 & 0.0028 & 0.0679 & 0.1180 \\
-AFNO V4, H1 & 4 & 0.91259 & 0.90342 & 0.0092 & 0.0534 & 0.1236 \\
-AFNO V4, H2 & 4 & 0.91062 & 0.90161 & 0.0090 & 0.0542 & 0.1257 \\
-AFNO V4, H3 & 4 & 0.91094 & 0.90150 & 0.0094 & 0.0539 & 0.1255 \\
-ResGRU, H4 & 7 & 0.91456 & 0.90988 & 0.0047 & 0.0651 & 0.1202 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsection{An ML + DL Hybrid}
 \label{sec:hybrid}
@@ -764,7 +656,7 @@ We tested whether a classical model can correct the network. A LightGBM model \c
 
 The hybrid did not improve the score. It scores lower in all four held-out months and 0.9051 against 0.9193 pooled (Table~\ref{tab:hybrid} and Fig.~\ref{fig:hybrid}). RMSE and $R^2$ improve slightly pooled (17.75 against 18.04; 0.895 against 0.892) and MAE is slightly worse (6.42 against 6.32), but episode SMAPE rises from 0.235 to 0.305. The regression gains are not uniform: RMSE falls in April and October and rises in July and December. This is the calibration trade-off in reverse, and it fits the theory of Section~\ref{sec:theory}: a symmetric loss in log space pulls forecasts toward the typical value, which removes the upward shift that the episode terms reward. The mean correction is 0.072 in log, about 7\%. The model relied most on the forecast's change from the last hour and on the seed spread (15\% and 13\% of its split gain), then on location, the ensemble forecast itself and the cell's climatology. The rule allowed a test submission only after a win. After the verdict, the hybrid was fitted on all four months and scored on the test set once, for the record: 0.8608, against 0.8838 for the uncalibrated ensemble it corrects (public part: 0.8775 against 0.8975). The test result agrees with the validation verdict.
 
-\begin{table*}[!t]
+\begin{table*}[!tb]
 \centering
 \caption{The hybrid, out of fold: fit on three validation months, predict the fourth. Ens.: uncalibrated ResGRU-UNet five-seed ensemble; Hyb.: ensemble + LightGBM correction. Windows: fitted/predicted. MAE, RMSE in \ugm}
 \label{tab:hybrid}
@@ -785,7 +677,7 @@ Pooled & 214 & 0.9193 & 0.9051 & 0.235 & 0.305 & 6.32 & 6.42 & 18.04 & 17.75 & 0
 \end{tabular}
 \end{table*}
 
-\begin{figure*}[!t]
+\begin{figure*}[!tb]
 \centering
 \includegraphics[width=\textwidth]{fig_hybrid.pdf}
 \caption{The ML + DL hybrid. (a) Score in each held-out month: the correction lowers it every time. (b) RMSE in each held-out month: lower in April and October, higher in July and December. (c) The twelve features with the largest share of LightGBM's split gain, from a fit on all four months.}
@@ -794,27 +686,9 @@ Pooled & 214 & 0.9193 & 0.9051 & 0.235 & 0.305 & 6.32 & 6.42 & 18.04 & 17.75 & 0
 
 \subsection{What the Linear Model Learned}
 \label{sec:ridge}
-The ridge baseline is the classical reference, and its weights show what a linear forecaster takes from the same inputs. The penalty hardly matters up to $10^2$ (Table~\ref{tab:ridgegrid}); the chosen $\lambda=10^{-2}$ scores 0.8637 and zero weights give persistence's 0.8515 exactly, as they must. The inputs are standardized per cell, so the weights are comparable (Fig.~\ref{fig:ridge}). The weight on the last hour's \PM{} goes from $+0.09$ at hour 1 to $-1.72$ at hour 13, so the forecast relaxes from the last value as the lead grows. The diurnal anomaly (up to $+0.82$), \PM{} one hour earlier ($-0.19$ to $+0.57$), \PM{} nine and eight hours earlier (up to $+0.39$ and down to $-0.20$) and the tendency (up to $+0.13$) take the next largest weights; the other 23 weights stay within $\pm0.11$. The inputs are correlated, so single weights should not be read as causal effects. The linear model gains on persistence overall but loses on episode cells (Table~\ref{tab:episode}), and on the test set it barely improves on persistence; the gap from ridge (0.8637) to the networks (0.8945 to 0.9158) measures what nonlinear spatial modelling adds within the same pipeline.
+The ridge baseline is the classical reference, and its weights show what a linear forecaster takes from the same inputs. The penalty hardly matters up to $10^2$ (Table~\ref{tab:ridgegrid} in Appendix~\ref{app:supp}); the chosen $\lambda=10^{-2}$ scores 0.8637 and zero weights give persistence's 0.8515 exactly, as they must. The inputs are standardized per cell, so the weights are comparable (Fig.~\ref{fig:ridge}). The weight on the last hour's \PM{} goes from $+0.09$ at hour 1 to $-1.72$ at hour 13, so the forecast relaxes from the last value as the lead grows. The diurnal anomaly (up to $+0.82$), \PM{} one hour earlier ($-0.19$ to $+0.57$), \PM{} nine and eight hours earlier (up to $+0.39$ and down to $-0.20$) and the tendency (up to $+0.13$) take the next largest weights; the other 23 weights stay within $\pm0.11$. The inputs are correlated, so single weights should not be read as causal effects. The linear model gains on persistence overall but loses on episode cells (Table~\ref{tab:episode}), and on the test set it barely improves on persistence; the gap from ridge (0.8637) to the networks (0.8945 to 0.9158) measures what nonlinear spatial modelling adds within the same pipeline.
 
-\begin{table}[!t]
-\centering
-\caption{Ridge penalty search on validation}
-\label{tab:ridgegrid}
-\begin{tabular}{@{}lc@{}}
-\toprule
-Penalty $\lambda$ & Validation $S$ \\
-\midrule
-$10^{-2}$ & 0.86370 \\
-$10^{0}$ & 0.86370 \\
-$10^{2}$ & 0.86368 \\
-$10^{4}$ & 0.86227 \\
-$10^{6}$ & 0.85753 \\
-0 (persistence) & 0.85154 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[!t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\columnwidth]{fig_ridge_weights.pdf}
 \caption{Ridge weights on the predicted log change by lead hour, for the six inputs with the largest weights (inputs standardized per cell). The other 23 weights stay within $\pm0.11$.}
@@ -825,7 +699,7 @@ $10^{6}$ & 0.85753 \\
 \label{sec:cost}
 ResGRU-UNet is also cheaper (Table~\ref{tab:cost}): 25.8 against 48.6~ms per window at inference, 0.23 against 1.36~GB of peak inference memory at batch 4, and about 190 against 338~s per training epoch on a T4. Parameter count does not predict cost or accuracy here. ConvLSTM has the most parameters, almost all in two spectral blocks, yet it is the fastest to train after patch AFNO and the weakest on the score; FMG-WACLU has the fewest and is the slowest, probably because it runs three ConvLSTMs at full resolution.
 
-\begin{table}[!t]
+\begin{table}[!htb]
 \centering
 \caption{Cost on one NVIDIA T4. Training: seconds per epoch and minutes per run (mean over the round-one and seed runs). Inference was timed for the finalists only}
 \label{tab:cost}
@@ -843,6 +717,7 @@ ConvLSTM & 19.0M & 69 & 19 & & \\
 \end{tabular}
 \end{table}
 
+\FloatBarrier
 \section{Discussion}
 \label{sec:discussion}
 \subsection{Why the Pipeline Dominates}
@@ -1079,7 +954,138 @@ ConvLSTM step & $Nk^2(d_x+d_h)\,4d_h$ & $+(k-1)/2$ cells \\
 \end{table}
 
 \section{Full Results}
-\label{app:regfull}\label{app:tests}\label{app:checks}\label{app:extra}
+\label{app:regfull}\label{app:tests}\label{app:checks}\label{app:extra}\label{app:supp}
+\subsection{Detailed Results for Sections~\ref{sec:results} and~\ref{sec:analysis}}
+The tables and figures below support Sections~\ref{sec:results} and~\ref{sec:analysis}: every seed of each finalist on validation and on both parts of the test set (Table~\ref{tab:seeds}), the regression metrics at five lead hours (Table~\ref{tab:lead}), the fitted calibration factors (Fig.~\ref{fig:calibscales}), the five-seed ensembles by validation month and by concentration (Tables~\ref{tab:months} and~\ref{tab:bins}), the training curves of the 12 logged runs (Table~\ref{tab:curves}) and the ridge penalty search (Table~\ref{tab:ridgegrid}).
+
+\begin{table}[!htbp]
+\centering
+\caption{Every seed of each finalist: validation, the private test (reported as test throughout) and the public test. No ensemble or calibration}
+\label{tab:seeds}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Network & Seed & Validation & Test & Public test \\
+\midrule
+AFNO V4 & 42 & 0.91103 & 0.8762 & 0.8878 \\
+AFNO V4 & 1337 & 0.91141 & 0.8749 & 0.8882 \\
+AFNO V4 & 1 & 0.91178 & 0.8758 & 0.8881 \\
+AFNO V4 & 2 & 0.91227 & 0.8767 & 0.8880 \\
+AFNO V4 & 3 & 0.91080 & 0.8734 & 0.8876 \\
+\midrule
+ResGRU-UNet & 42 & 0.91579 & 0.8798 & 0.8924 \\
+ResGRU-UNet & 1337 & 0.91523 & 0.8788 & 0.8930 \\
+ResGRU-UNet & 1 & 0.91687 & 0.8796 & 0.8956 \\
+ResGRU-UNet & 2 & 0.91784 & 0.8805 & 0.8951 \\
+ResGRU-UNet & 3 & 0.91579 & 0.8810 & 0.8957 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Validation MAE / RMSE (\ugm) / $R^2$ at five lead hours (no calibration)}
+\label{tab:lead}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & $h=1$ & $h=4$ & $h=8$ & $h=12$ & $h=16$ \\
+\midrule
+Persistence & 2.14 / 6.82 / 0.985 & 7.32 / 19.49 / 0.875 & 11.63 / 28.19 / 0.735 & 13.58 / 31.53 / 0.667 & 13.57 / 31.41 / 0.674 \\
+Seasonal naive & 11.78 / 27.42 / 0.751 & 11.72 / 27.26 / 0.755 & 11.55 / 26.84 / 0.760 & 11.38 / 26.40 / 0.767 & 11.31 / 26.22 / 0.773 \\
+Ridge & 1.58 / 5.59 / 0.990 & 6.60 / 17.07 / 0.904 & 9.67 / 23.20 / 0.821 & 10.50 / 24.71 / 0.796 & 11.00 / 25.67 / 0.782 \\
+AFNO V4, 5 seeds & 1.49 / 5.46 / 0.990 & 4.77 / 14.63 / 0.929 & 7.62 / 20.75 / 0.857 & 9.04 / 22.69 / 0.828 & 9.76 / 23.66 / 0.815 \\
+ResGRU-UNet, 5 seeds & 1.31 / 4.92 / 0.992 & 4.29 / 13.26 / 0.942 & 6.84 / 18.93 / 0.881 & 8.18 / 21.14 / 0.850 & 9.07 / 22.68 / 0.830 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.55\textwidth]{fig_calib_scales.pdf}
+\caption{Fitted calibration factors $c_h$ of the five-seed ensembles by lead hour: fitted on all four validation months (thick) and with one month left out (thin).}
+\label{fig:calibscales}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering
+\caption{Five-seed ensemble scores by validation month (no calibration)}
+\label{tab:months}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Month & AFNO V4 & ResGRU-UNet & Gap \\
+\midrule
+April & 0.9097 & 0.9162 & +0.0064 \\
+July & 0.9056 & 0.9091 & +0.0035 \\
+October & 0.9233 & 0.9271 & +0.0038 \\
+December & 0.9194 & 0.9249 & +0.0055 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Five-seed ensembles by true concentration (\ugm): share of values, mean SMAPE and mean log bias (positive: too high)}
+\label{tab:bins}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrcccc@{}}
+\toprule
+ & & \multicolumn{2}{c}{SMAPE} & \multicolumn{2}{c}{Log bias} \\
+\cmidrule(lr){3-4}\cmidrule(l){5-6}
+Bin & Share & AFNO & ResGRU & AFNO & ResGRU \\
+\midrule
+0 to 10 & 36.5\% & 0.261 & 0.241 & +0.103 & +0.085 \\
+10 to 25 & 26.1\% & 0.181 & 0.167 & +0.071 & +0.050 \\
+25 to 50 & 16.6\% & 0.177 & 0.161 & +0.073 & +0.048 \\
+50 to 100 & 11.8\% & 0.158 & 0.144 & +0.070 & +0.046 \\
+100 to 200 & 6.5\% & 0.160 & 0.149 & +0.046 & +0.021 \\
+above 200 & 2.5\% & 0.147 & 0.147 & $-$0.009 & $-$0.026 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Training curves of the 12 logged runs (ResGRU: ResGRU-UNet; s: seed): best epoch and its validation score, the score at the last epoch (16), the drop, the lowest training loss, and the validation loss at a training loss of 0.09 (interpolated)}
+\label{tab:curves}
+\setlength{\tabcolsep}{2.4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Run & Peak & $S$ peak & $S$ last & Drop & Min tr. & Val@0.09 \\
+\midrule
+AFNO V4, s1 & 4 & 0.91178 & 0.90260 & 0.0092 & 0.0537 & 0.1247 \\
+AFNO V4, s2 & 4 & 0.91227 & 0.90222 & 0.0101 & 0.0536 & 0.1241 \\
+AFNO V4, s3 & 5 & 0.91080 & 0.90185 & 0.0090 & 0.0539 & 0.1257 \\
+ResGRU, s42 & 7 & 0.91579 & 0.91237 & 0.0034 & 0.0660 & 0.1178 \\
+ResGRU, s1337 & 6 & 0.91523 & 0.91222 & 0.0030 & 0.0646 & 0.1174 \\
+ResGRU, s1 & 7 & 0.91687 & 0.91273 & 0.0041 & 0.0679 & 0.1168 \\
+ResGRU, s2 & 6 & 0.91784 & 0.91337 & 0.0045 & 0.0635 & 0.1146 \\
+ResGRU, s3 & 7 & 0.91578 & 0.91294 & 0.0028 & 0.0679 & 0.1180 \\
+AFNO V4, H1 & 4 & 0.91259 & 0.90342 & 0.0092 & 0.0534 & 0.1236 \\
+AFNO V4, H2 & 4 & 0.91062 & 0.90161 & 0.0090 & 0.0542 & 0.1257 \\
+AFNO V4, H3 & 4 & 0.91094 & 0.90150 & 0.0094 & 0.0539 & 0.1255 \\
+ResGRU, H4 & 7 & 0.91456 & 0.90988 & 0.0047 & 0.0651 & 0.1202 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Ridge penalty search on validation}
+\label{tab:ridgegrid}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Penalty $\lambda$ & Validation $S$ \\
+\midrule
+$10^{-2}$ & 0.86370 \\
+$10^{0}$ & 0.86370 \\
+$10^{2}$ & 0.86368 \\
+$10^{4}$ & 0.86227 \\
+$10^{6}$ & 0.85753 \\
+0 (persistence) & 0.85154 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Regression Metrics}
 Table~\ref{tab:regfull} gives the validation metrics of every model on the raw scale and in $\log(1+y)$, with the Pearson correlation $r$ over all values. The log-space $R^2$ orders the finalists as the raw one does (0.952 against 0.944 for the five-seed ensembles).
 
@@ -1230,21 +1236,21 @@ Decile & Cell mean & AFNO V4 & ResGRU-UNet & Difference \\
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_terms_by_hour.pdf}
+\includegraphics[width=0.85\textwidth]{fig_terms_by_hour.pdf}
 \caption{The three terms of the benchmark score and the score itself by lead hour, on validation. Thin lines: single seeds; thick lines: five-seed means.}
 \label{fig:terms}
 \end{figure}
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.62\textwidth, trim=155 79 194 71, clip]{fig_case.png}
+\includegraphics[width=0.5\textwidth, trim=155 79 194 71, clip]{fig_case.png}
 \caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log colour scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
 \label{fig:case}
 \end{figure}
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_smape_maps.pdf}
+\includegraphics[width=0.85\textwidth]{fig_smape_maps.pdf}
 \caption{Mean SMAPE per cell for the five-seed means of AFNO V4 (a) and ResGRU-UNet (b), and their difference (c). ResGRU-UNet is lower in 94.7\% of cells.}
 \label{fig:smape}
 \end{figure}
