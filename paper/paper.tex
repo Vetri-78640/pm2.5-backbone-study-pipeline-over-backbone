@@ -11,6 +11,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,calc,fit,backgrounds}
 \usepackage{placeins}
+\usepackage{float}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{figures/}}
 \sisetup{group-minimum-digits=4}
@@ -39,6 +40,11 @@
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{5}
 \setcounter{dbltopnumber}{3}
+% float-only pages: stack floats from the top instead of spreading them over the page
+\makeatletter
+\setlength{\@fptop}{0pt}\setlength{\@fpsep}{14pt}\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}\setlength{\@dblfpsep}{14pt}\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 
 \begin{document}
 
@@ -1132,7 +1138,7 @@ Date & Forecast & Public & Private (test) \\
 \subsection{Automated Checks}
 Each analysis stage writes its checks into its run record, and the record is kept only if they pass. Table~\ref{tab:checks} counts them; all 68 pass. They fall into four kinds: recomputed scores equal the logged ones (for example, each seed's validation score, the five-seed ensembles and the two-seed calibration); test forecasts equal the training run's own output (relative difference below $10^{-3}$); identities that must hold (zero ridge weights give persistence; a zero hybrid correction gives the ensemble; the truth scored against itself gives MAE 0, RMSE 0 and $R^2$ 1); and data checks (shapes, finite and non-negative forecasts, no month fitted on itself).
 
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \caption{Automated checks in the run records}
 \label{tab:checks}
@@ -1155,9 +1161,9 @@ Total & 68 & all pass \\
 \end{table}
 
 \subsection{Additional Results}
-Table~\ref{tab:deciles} splits the SMAPE of the two ensembles by how polluted a cell is, Fig.~\ref{fig:terms} splits the score into its three terms by lead hour, Fig.~\ref{fig:smape} maps the SMAPE of both ensembles, and Fig.~\ref{fig:case} shows one window in detail.
+Table~\ref{tab:deciles} splits the SMAPE of the two ensembles by how polluted a cell is, Fig.~\ref{fig:terms} splits the score into its three terms by lead hour, Fig.~\ref{fig:case} shows one window in detail, and Fig.~\ref{fig:smape} maps the SMAPE of both ensembles.
 
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \caption{Mean SMAPE of the five-seed ensembles in each decile of cells, ranked by mean \PM{} (\ugm)}
 \label{tab:deciles}
@@ -1187,6 +1193,13 @@ Decile & Cell mean & AFNO V4 & ResGRU-UNet & Difference \\
 \label{fig:terms}
 \end{figure*}
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth, trim=155 79 194 71, clip]{fig_case.png}
+\caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log colour scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
+\label{fig:case}
+\end{figure}
+
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig_smape_maps.pdf}
@@ -1194,14 +1207,6 @@ Decile & Cell mean & AFNO V4 & ResGRU-UNet & Difference \\
 \label{fig:smape}
 \end{figure*}
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=\columnwidth, trim=155 79 194 71, clip]{fig_case.png}
-\caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log colour scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
-\label{fig:case}
-\end{figure}
-
-\FloatBarrier
 \begin{thebibliography}{99}
 \bibitem{pandey2021} A. Pandey \emph{et al.}, ``Health and economic impact of air pollution in the states of India: The Global Burden of Disease Study 2019,'' \emph{Lancet Planet. Health}, vol. 5, no. 1, pp. e25--e38, 2021.
 \bibitem{grell2005} G. A. Grell, S. E. Peckham, R. Schmitz, S. A. McKeen, G. Frost, W. C. Skamarock, and B. Eder, ``Fully coupled `online' chemistry within the WRF model,'' \emph{Atmos. Environ.}, vol. 39, no. 37, pp. 6957--6975, 2005.
