@@ -4,7 +4,7 @@
 
 ### A Controlled Study of Deep Networks for PM<sub>2.5</sub> Forecasting over India
 
-**Vetriselvan R**, Independent Researcher
+**Vetriselvan R**, Rishihood University
 
 [![Paper](https://img.shields.io/badge/paper-PDF-b31b1b.svg)](paper/paper.pdf)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2a78d6.svg)](LICENSE)
