@@ -15,6 +15,11 @@
 \usepackage{dblfloatfix}
 \usepackage{balance}
 \usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\fancyhf{}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{IEEEtitlepagestyle}{\fancyhf{}\cfoot{\thepage}\renewcommand{\headrulewidth}{0pt}}
 \makeatletter\g@addto@macro{\UrlBreaks}{\do\-}\makeatother % long addresses may break at hyphens
 \graphicspath{{figures/}}
 \sisetup{group-minimum-digits=4}
@@ -57,7 +62,7 @@
 Rishihood University\\
 \texttt{vetriselvan.radhakrishnan2024@nst.rishihood.edu.in}}
 
-\markboth{}{}
+\pagestyle{fancy}
 \hypersetup{pdftitle={Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting Over India}, pdfauthor={Vetriselvan R}, pdfkeywords={air quality forecasting, PM2.5, neural operators, convolutional recurrent networks, controlled comparison}}
 
 \maketitle
