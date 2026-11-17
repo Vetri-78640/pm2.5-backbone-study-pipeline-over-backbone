@@ -26,7 +26,7 @@
 \makeatother
 
 \newcommand{\ugm}{\si{\micro\gram\per\cubic\metre}}
-\newcommand{\PM}{PM\textsubscript{2.5}}
+\newcommand{\PM}{PM$_{2.5}$}
 \definecolor{cres}{HTML}{2A78D6}
 \definecolor{cafno}{HTML}{EB6834}
 \definecolor{cgray}{HTML}{6B6B66}
@@ -51,52 +51,52 @@
 
 \begin{document}
 
-\title{Pipeline Over Backbone: A Controlled Study of Deep Networks for \PM{} Forecasting over India}
+\title{Pipeline Over Backbone: A Controlled Study of Deep Networks for \PM{} Forecasting Over India}
 
-\author{\textbf{Vetriselvan~R}\\
-Rishihood University\\
+\author{Vetriselvan~R\\
+Rishihood University, Sonipat, Haryana, India\\
 \texttt{vetriselvan.radhakrishnan2024@nst.rishihood.edu.in}}
 
 \markboth{}{}
-\hypersetup{pdftitle={Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting over India}, pdfauthor={Vetriselvan R}}
+\hypersetup{pdftitle={Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting Over India}, pdfauthor={Vetriselvan R}, pdfkeywords={air quality forecasting, PM2.5, neural operators, convolutional recurrent networks, controlled comparison}}
 
 \maketitle
 
 \begin{abstract}
-Deep networks for gridded air-quality forecasting are usually compared with their inputs, validation, loss and post-processing changed along with the architecture, so a gain cannot be credited to the network. We separate the two for 16-hour \PM{} forecasting over India on a $140\times124$ grid of WRF-Chem fields. We build one physics-informed, leak-free pipeline, with ventilation and advection channels, a log-space persistence residual and a loss matched to the evaluation metric, and train five networks inside it, with decision rules fixed before each stage and up to five seeds. Moving the same network into this pipeline raised its held-out test score 6 to 8 times more than choosing the better of the two best networks. Inside the fixed pipeline, a U-Net with a convolutional GRU over lead time (ResGRU-UNet) beats an adaptive Fourier neural operator (AFNO V4) on all 25 seed pairs, on both parts of the test set and at every lead hour, with 31.8\% lower RMSE than persistence (validation $R^2$ 0.892 against 0.874). Validation and test rank 25 forecasts alike (Spearman 0.93). Single-change ablations do not explain the gap, the ranking of the weaker networks changes with the metric, and a gradient-boosted correction lowers RMSE but not the benchmark score.
+Deep networks for gridded air quality forecasting are often compared with their inputs, validation, loss and post-processing changed along with the architecture, so a gain cannot be credited to the network. We separate the two for 16-hour \PM{} forecasting over India on a $140\times124$ grid of WRF-Chem fields. We build one physics-informed, leak-free pipeline, with ventilation and advection channels, a log-space persistence residual and a loss matched to the evaluation metric, and train five networks inside it, with decision rules fixed before each stage and up to five seeds. Moving a network from its earlier pipeline into this one raised its held-out test score by 0.025 to 0.031 (for two of the three networks this includes a bug fix), several times the 0.0036 to 0.0045 gap between the two best networks at one seed, although the five networks still span 0.035. Inside the fixed pipeline, a U-Net with a convolutional GRU over lead time (ResGRU-UNet) beat an adaptive Fourier neural operator (AFNO V4) on all 25 seed pairs and on both parts of the test set, and on validation at every lead hour and in every month, with 31.8\% lower RMSE than persistence ($R^2$ 0.892 against 0.874 for AFNO V4). Single-change ablations did not explain the gap, the ranking of the weaker networks changed with the metric, and a gradient-boosted correction lowered RMSE but not the benchmark score. Networks of similar quality should therefore be compared only after the pipeline is fixed.
 \end{abstract}
 
 \begin{IEEEkeywords}
-air quality forecasting, \PM, neural operators, convolutional recurrent networks, controlled comparison, spatio-temporal deep learning
+Air quality forecasting, controlled comparison, convolutional recurrent networks, neural operators, \PM, spatio-temporal deep learning
 \end{IEEEkeywords}
 
 \section{Introduction}
 \label{sec:intro}
-\IEEEPARstart{F}{ine} particulate matter (\PM) is the largest environmental health risk in India: air pollution was linked to an estimated 1.67 million deaths there in 2019 \cite{pandey2021}. Country-wide forecasts usually come from chemistry transport models such as WRF-Chem \cite{grell2005}, which couple weather, emissions, chemistry and transport and are expensive to run. A deep network that learns to step such a model forward from its recent fields could forecast at a small fraction of the cost.
+\IEEEPARstart{F}{ine} particulate matter (\PM) is the largest environmental health risk in India: air pollution was linked to an estimated 1.67 million deaths there in 2019 \cite{pandey2021}. Country-wide forecasts usually come from chemistry transport models such as WRF-Chem, the Weather Research and Forecasting model coupled with chemistry \cite{grell2005}, which couple weather, emissions, chemistry and transport and are expensive to run. A deep network that learns to step such a model forward from its recent fields could forecast at a small fraction of the cost.
 
-Forecasting \PM{} over a whole country is a large spatio-temporal problem: here 17{,}360 grid cells, 16 lead hours, and weather fields that carry pollution across the map. Two families of deep networks suit gridded forecasting. Fourier neural operators mix the whole map at once in the frequency domain \cite{li2021fno,guibas2022afno}. Convolutional-recurrent networks pass local information step by step \cite{shi2015convlstm,ballas2016convgru}. Published comparisons between them usually change the inputs, validation, loss and post-processing along with the network, so a difference in score cannot be credited to the network alone. In image classification, a better training recipe closed much of the reported gap between older and newer architectures \cite{wightman2021,bello2021,liu2022convnext}, and in long-horizon forecasting one-layer linear models beat Transformers \cite{zeng2023}. Whether the same holds for gridded air-quality forecasting has, to our knowledge, not been tested.
+Forecasting \PM{} over a whole country is a large spatio-temporal problem: here 17{,}360 grid cells, 16 lead hours, and weather fields that carry pollution across the map. Two families of deep networks suit gridded forecasting. Fourier neural operators mix the whole map at once in the frequency domain \cite{li2021fno,guibas2022afno}. Convolutional-recurrent networks pass local information step by step \cite{shi2015convlstm,ballas2016convgru}. Published comparisons between them often change the inputs, validation, loss and post-processing along with the network, so a difference in score cannot be credited to the network alone. In image classification, a better training recipe closed much of the reported gap between older and newer architectures \cite{wightman2021,bello2021,liu2022convnext}, and in long-horizon forecasting one-layer linear models beat Transformers \cite{zeng2023}. Whether the same holds for gridded air quality forecasting has, to our knowledge, not been tested.
 
 The two effects are hard to separate in practice. A network is usually developed together with its pipeline, and each new pipeline is tuned around the network it was built for, so a comparison with a network trained in an older pipeline mixes the two. Our own development followed this path (Appendix~\ref{sec:history}): over seven iterations the split, the episode masks, the inputs, the loss, the hour handling and the post-processing all changed together with the network, and at the end the question ``which network is better?'' could not be answered fairly.
 
-In this paper we test the question directly. We fixed the pipeline that the seven iterations produced and trained five networks inside it, two Fourier neural operators and three convolutional-recurrent networks, changing nothing but the network. Decision rules were written down before each stage, and the finalists were run with 1, 2 and 5 seeds. Fig.~\ref{fig:teaser} shows the main result: moving a network into the improved pipeline raised its held-out test score by 0.025 to 0.031, while the best network beat the second best by 0.0036 at one seed and 0.0066 with the full recipe.
+In this paper we test the question directly. We fixed the pipeline that the seven iterations produced and trained five networks inside it, two Fourier neural operators and three convolutional-recurrent networks, changing nothing but the network. Decision rules were written down before each stage, and the finalists were run with 1, 2 and 5 seeds. Fig.~\ref{fig:teaser} shows the main result: moving a network into the improved pipeline raised its held-out test score by 0.025 to 0.031, while the best network beat the second best by 0.0036 at one seed and 0.0066 with the full recipe. Across all five networks, the round-one test scores still span 0.035.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig_teaser.pdf}
-\caption{Gain in held-out test score from moving each network from its own earlier pipeline into the shared pipeline (coloured; one seed, no ensemble or calibration; patch AFNO's gain includes a bug fix), against the gain from choosing ResGRU-UNet over AFNO V4 inside the shared pipeline (grey): at one seed, as the mean of five single seeds, and with five-seed ensembles and calibration.}
+\caption{Gain in held-out test score from moving each network from its own earlier pipeline into the shared pipeline (colored; one seed, no ensemble or calibration; the gains of patch AFNO and ResGRU-UNet include bug fixes), against the gain from choosing ResGRU-UNet over AFNO V4 inside the shared pipeline (gray): at one seed, as the mean of five single seeds, and with five-seed ensembles and calibration.}
 \label{fig:teaser}
 \end{figure}
 
-The study gives three findings. First, the pipeline matters more than the network: the same network gains 6 to 8 times more from the pipeline than from the choice between the two best networks. Second, inside one pipeline the convolutional-recurrent U-Net beats the neural operator on every seed pair, both parts of the test set, every lead hour, every month and every regression metric, and it is cheaper to run. Third, rankings and post-processing depend on the metric: the weaker networks reorder when the metric changes, and per-hour calibration raises the benchmark score while it worsens MAE, RMSE and $R^2$.
+The study gives three findings. First, for networks of similar quality the pipeline matters more than the network: moving a network into the shared pipeline raised its test score about 4 to 9 times more than the choice between the two best networks, although the five networks together still span more than any single pipeline gain. Second, inside one pipeline the convolutional-recurrent U-Net beats the neural operator on every seed pair and both parts of the test set, and on validation at every lead hour, in every month and on every regression metric; it is also cheaper to run. Third, rankings and post-processing depend on the metric: the weaker networks reorder when the metric changes, and per-hour calibration raises the benchmark score while it worsens MAE, RMSE and $R^2$.
 
 Our contributions are:
 \begin{itemize}
 \item a controlled comparison of five deep networks inside one fixed pipeline, with decision rules fixed before each stage, up to five seeds, a block bootstrap and a check that validation predicts the held-out test (Sections~\ref{sec:setup} and~\ref{sec:results});
 \item evidence for the three findings, with ablations, training curves and breakdowns by lead hour, month, concentration and grid cell that test why the winner wins (Sections~\ref{sec:results} and~\ref{sec:analysis});
-\item a physics-informed, leak-free pipeline with the reasoning behind each choice, regression metrics against three baselines, an out-of-fold test of an ML + DL hybrid, and the code and run records behind every number (Sections~\ref{sec:method}, \ref{sec:setup} and~\ref{sec:hybrid}).
+\item a physics-informed, leak-free pipeline with the reasoning behind each choice, regression metrics against three baselines, an out-of-fold test of a hybrid that corrects the network with gradient boosting, and the code and run records behind every number (Sections~\ref{sec:method}, \ref{sec:setup} and~\ref{sec:hybrid}).
 \end{itemize}
 
-Section~\ref{sec:related} reviews related work and Section~\ref{sec:data} the task, data and metric. Section~\ref{sec:method} describes the shared pipeline and the five networks, and Section~\ref{sec:setup} the validation, baselines, statistics and decision rules. Section~\ref{sec:results} reports the three findings and Section~\ref{sec:analysis} analyses where and why the winner wins, the hybrid, the linear baseline and the cost. Section~\ref{sec:discussion} discusses what the results mean, Section~\ref{sec:threats} the threats to validity, and Section~\ref{sec:conclusion} concludes. The appendices hold the data exploration, the development history, the architecture and run details, and the full tables.
+Section~\ref{sec:related} reviews related work and Section~\ref{sec:data} the task, data and metric. Section~\ref{sec:method} describes the shared pipeline and the five networks, and Section~\ref{sec:setup} the validation, baselines, statistics and decision rules. Section~\ref{sec:results} reports the three findings and Section~\ref{sec:analysis} analyzes where and why the winner wins, the hybrid, the linear baseline and the cost. Section~\ref{sec:discussion} discusses what the results mean, Section~\ref{sec:threats} the threats to validity, and Section~\ref{sec:conclusion} concludes. The appendices hold the data exploration, the development history, the architecture and run details, and the full tables.
 
 \section{Related Work}
 \label{sec:related}
@@ -106,9 +106,9 @@ Section~\ref{sec:related} reviews related work and Section~\ref{sec:data} the ta
 
 \textbf{Convolutional-recurrent forecasting.} ConvLSTM replaced the matrix products of an LSTM with convolutions for precipitation nowcasting \cite{shi2015convlstm}; TrajGRU followed \cite{shi2017trajgru}, and the convolutional GRU is the gated-recurrent version \cite{ballas2016convgru}. U-Net's skip connections pass fine detail from encoder to decoder \cite{ronneberger2015unet}, and residual learning makes deep stacks easy to train \cite{he2016}. SimVP showed that a purely convolutional encoder, translator and decoder can match recurrent models \cite{gao2022simvp}. Shortcut recurrent-convolutional U-Nets were used for weather prediction \cite{leinonen2021}.
 
-\textbf{Recipe or architecture.} Several studies found that the training recipe, not the architecture, explained much of a reported gain. A plain ResNet-50 trained with a modern procedure reached 80.4\% ImageNet top-1 accuracy \cite{wightman2021}; improved training and scaling made ResNets competitive with newer models \cite{bello2021}; a ResNet modernized step by step competed with vision Transformers \cite{liu2022convnext}; and one-layer linear models beat Transformer forecasters on nine long-horizon benchmarks \cite{zeng2023}. In language modelling, well-regularized standard LSTMs tuned at scale matched or beat newer recurrent models \cite{melis2018}, and a large study of generative adversarial networks found that most models reach similar scores with enough tuning and random restarts \cite{lucic2018}. We run the same kind of test for gridded air-quality forecasting, with the pipeline, not only the optimizer settings, held fixed.
+\textbf{Recipe or architecture.} Several studies found that the training recipe, not the architecture, explained much of a reported gain. A plain ResNet-50 trained with a modern procedure reached 80.4\% ImageNet top-1 accuracy \cite{wightman2021}; improved training and scaling made ResNets competitive with newer models \cite{bello2021}; a ResNet modernized step by step competed with vision Transformers \cite{liu2022convnext}; and one-layer linear models beat Transformer forecasters on nine long-horizon benchmarks \cite{zeng2023}. In language modeling, well-regularized standard LSTMs tuned at scale matched or beat newer recurrent models \cite{melis2018}, and a large study of generative adversarial networks found that most models reach similar scores with enough tuning and random restarts \cite{lucic2018}. We run the same kind of test for gridded air quality forecasting, with the pipeline, not only the optimizer settings, held fixed.
 
-\textbf{Evaluation.} A point forecast should be judged with a scoring function matched to what it is meant to estimate; a mismatched score can lead to badly wrong conclusions \cite{gneiting2011}. SMAPE is not symmetric in additive error \cite{goodwin1999}. Dependent data need blocked rather than random validation \cite{roberts2017}, information the model would not have at forecast time inflates scores \cite{kaufman2012}, and the block bootstrap resamples blocks of consecutive observations to keep their dependence \cite{kunsch1989}. Data sampling, initialization and hyperparameter choice can change benchmark results markedly, so these sources of variation should be randomized and reported \cite{bouthillier2021}. Persistence and seasonal naive are the standard forecasts to beat \cite{hyndman2021}, and ridge regression \cite{hoerl1970} is our classical model.
+\textbf{Evaluation.} A point forecast should be judged with a scoring function matched to what it is meant to estimate; a mismatched score can lead to badly wrong conclusions \cite{gneiting2011}. The symmetric mean absolute percentage error (SMAPE) is not symmetric in additive error \cite{goodwin1999}. Dependent data need blocked rather than random validation \cite{roberts2017}, information the model would not have at forecast time inflates scores \cite{kaufman2012}, and the block bootstrap resamples blocks of consecutive observations to keep their dependence \cite{kunsch1989}. Data sampling, initialization and hyperparameter choice can change benchmark results markedly, so these sources of variation should be randomized and reported \cite{bouthillier2021}. Persistence and seasonal naive are the standard forecasts to beat \cite{hyndman2021}, and ridge regression \cite{hoerl1970} is our classical model.
 
 \textbf{Training.} We use AdamW \cite{loshchilov2019}, the one-cycle schedule \cite{smith2019}, GroupNorm \cite{wu2018}, weight averaging \cite{polyak1992} and deep ensembles \cite{lakshminarayanan2017}. For the hybrid we use LightGBM \cite{ke2017lightgbm}.
 
@@ -119,7 +119,7 @@ Given the fields $\mathbf{X}_{t-9:t}$ of the last 10 hours, one network forecast
 \begin{equation}
 \hat{\mathbf{y}}_{t+h} = f_\theta(\mathbf{X}_{t-9:t})_h, \qquad h = 1,\dots,16,
 \end{equation}
-where each $\hat{\mathbf{y}}_{t+h}$ is a $140\times124$ map of \PM{} in \ugm. The task is a regression problem. A window spans 26 hours, 10 inputs and 16 targets.
+where each $\hat{\mathbf{y}}_{t+h}$ is a $140\times124$ map of \PM{} in \ugm. A window spans 26 hours, 10 inputs and 16 targets.
 
 \subsection{Data}
 The data are WRF-Chem simulation fields released by the organizers of the ANRF AISEHack 2026 challenge (Theme 2, IIT Delhi) \cite{aisehack2026}. Training covers four months of 2016, one per season (April, July, October and December; 715 or 739 hours each), on a Mercator grid of $140\times124$ cells from 7.06 to 38.00$^\circ$N and 67.79 to 97.93$^\circ$E, about 25~km apart (27.1~km east to west at the southern edge and 21.5~km at the northern edge). Each hour has 16 fields: surface \PM{} (the target), eight weather fields and seven emission fields (Table~\ref{tab:fields}).
@@ -134,10 +134,10 @@ The data are WRF-Chem simulation fields released by the organizers of the ANRF A
 Field & Unit & Meaning and use \\
 \midrule
 \PM{} (cpm25) & \ugm & surface concentration; target and input \\
-q2 & kg/kg & 2-m specific humidity; input \\
+q2 & \si{\kilo\gram\per\kilo\gram} & 2-m specific humidity; input \\
 t2 & K & 2-m temperature; input \\
-u10, v10 & m/s & 10-m zonal and meridional wind; input, advection, ventilation \\
-swdown & W/m$^2$ & downward shortwave radiation; input, hour estimation \\
+u10, v10 & \si{\metre\per\second} & 10-m zonal and meridional wind; input, advection, ventilation \\
+swdown & \si{\watt\per\square\metre} & downward shortwave radiation; input, hour estimation \\
 pblh & m & boundary-layer height; input, ventilation \\
 psfc & Pa & surface pressure; input \\
 rain & mm & rain in the hour; input (log) \\
@@ -149,7 +149,7 @@ rain & mm & rain in the hour; input (log) \\
 The test set is 218 windows of 10 hours from 2017; its answers are hidden and scored by the organizers' evaluation server. The server reports the score on two parts of the test set, a public part and a private part. Throughout the paper, ``test'' means the private part. The public part, which gave feedback during the early development iterations (Appendix~\ref{sec:history}), is reported alongside it where it adds evidence (Appendix~\ref{app:tests}, Tables~\ref{tab:seeds} and~\ref{tab:tests}).
 
 \subsection{Episodes}
-For each cell $i$, a robust STL decomposition \cite{cleveland1990} with a 24-hour period splits the month into trend, daily cycle and residual $r_{i,t}$. An hour is an episode when
+For each cell $i$, a robust STL (seasonal-trend decomposition using loess) \cite{cleveland1990} with a 24-hour period and otherwise default settings splits the month into trend, daily cycle and residual $r_{i,t}$. An hour is an episode when
 \begin{equation}
 r_{i,t} > 3\,\sigma_i \quad\text{and}\quad y_{i,t} > 1~\ugm,
 \end{equation}
@@ -157,16 +157,16 @@ where $\sigma_i$ is the standard deviation of that cell's residuals. Episodes ar
 
 \subsection{Benchmark Score}
 \label{sec:score}
-With $\mathrm{SMAPE}(p,y)=|p-y|/\bigl(\tfrac12(|p|+|y|)\bigr)$, let $G$ be the mean SMAPE over all cells and hours, $E$ its mean over episode cells, and $\rho$ the Pearson correlation of forecast and truth over episode cells, computed per hour and averaged. The benchmark score is
+With $\mathrm{SMAPE}(p,y)=|p-y|/\bigl(\tfrac12(|p|+|y|)\bigr)$, let $G$ be the mean SMAPE over all cells and hours, $E$ its mean over episode cells, and $\rho$ the Pearson correlation of forecast and truth over episode cells. Each term is computed for every window and lead hour and then averaged; $E$ skips hours without episode cells and $\rho$ hours with fewer than three. The benchmark score is
 \begin{equation}
 S = w_1\bigl(1-\tfrac{G}{2}\bigr) + w_2\,\tfrac{1+\rho}{2} + w_3\bigl(1-\tfrac{E}{2}\bigr).
 \label{eq:score}
 \end{equation}
-The weights are not disclosed, so on validation we use $w_i=1/3$. Each term lies in $[0,1]$, and higher is better. $S$ is a composite of relative error and correlation, not an accuracy: two of its three terms see only the 1.8\% of values that are episodes, and none of them is on the raw scale of the concentration.
+The weights are not disclosed, so on validation we use $w_i=1/3$. Each term lies in $[0,1]$, and higher is better. The score $S$ combines relative error and correlation. Two of its three terms see only the 1.8\% of values that are episodes, and none is on the raw scale of the concentration, so $S$ does not measure raw-scale accuracy.
 
 \subsection{What the Data Showed}
 \label{sec:eda}
-Table~\ref{tab:eda} lists what the exploration of the four training months showed and what each finding changed in the pipeline; Appendix~\ref{app:eda} gives the details. Three findings shaped the method most. The concentration is right-skewed (skewness 5.1, but 0.13 after the log), so the networks work in $\log(1+y)$. The field is persistent at short lead and loses that memory over the horizon (the lag-1 autocorrelation of $\log(1+y)$ is 0.978, and the standard deviation of its change grows from 0.101 after one hour to 0.505 after 16), so the networks predict the change from persistence and later hours carry more weight in the loss. Finally, the wind moves \PM{} about 10 cells in 16 hours, so a forecast needs a receptive field of that size, not the whole map.
+Table~\ref{tab:eda} lists what the exploration of the four training months showed and what each finding changed in the pipeline; Appendix~\ref{app:eda} gives the details. Three findings shaped the method most. The concentration is right-skewed (skewness 5.1, but 0.13 after the log), so the networks work in $\log(1+y)$. The field is persistent at short lead and loses that memory over the horizon (the lag-1 autocorrelation of $\log(1+y)$ is 0.978, and the standard deviation of its change grows from 0.101 after one hour to 0.505 after 16), so the networks predict the change from persistence and later hours carry more weight in the loss. Finally, the wind moves \PM{} about 10 cells in 16 hours, so a forecast needs a receptive field of about that size.
 
 \begin{table}[!htb]
 \centering
@@ -178,7 +178,7 @@ Finding & What the model gets \\
 \midrule
 Right-skewed: December mean 59.1, median 23.7~\ugm & Work in $\log(1+y)$ \\
 Lag-1 autocorrelation of $\log(1+y)$ is 0.978; the standard deviation of its change grows from 0.101 at 1 h to 0.505 at 16 h & Predict the change from persistence; weight later hours more \\
-Mean 10-m wind 4.24~m/s: \PM{} moves about 10 cells in 16 h & Advection channel; a local receptive field suffices \\
+Mean 10-m wind 4.24~\si{\metre\per\second}: \PM{} moves about 10 cells in 16 h & Advection channel; a local receptive field suffices \\
 Strong daily cycle (correlation 0.571 at 24 h); test windows carry no clock & Estimated hour; diurnal anomaly \\
 Hotspots over the Indo-Gangetic Plain and the eastern coal belt; monthly means 15.4 (July) to 59.1 (December) & Per-cell normalization; static climatology \\
 Episodes are about 2\% of cell-hours and are defined on the truth & Episode-weighted loss; calibration \\
@@ -201,7 +201,7 @@ Fig.~\ref{fig:overview} shows the pipeline. Each part below was added to fix a p
 \node[b, fill=cres!10, draw=cres, dashed, line width=0.9pt, right=of ph, text width=30mm] (bb) {\textbf{Backbone} $f_\theta$\\ (the only change)\\[1pt] {\scriptsize ResGRU-UNet, AFNO V4,\\ FMG-WACLU, ConvLSTM,\\ patch AFNO}};
 \node[b, right=of bb] (res) {\textbf{Persistence residual}\\ $\log(1{+}y_t)+\Delta_h$,\\ $h=1,\dots,16$};
 \node[b, right=of res] (post) {\textbf{Post-processing}\\ seed ensemble,\\ per-hour factor $c_h$\\ (finalists)};
-\node[b, right=of post, text width=16mm] (out) {\textbf{Forecast}\\ 16 maps of\\ $140{\times}124$};
+\node[b, right=of post, text width=16mm] (out) {\textbf{Forecast}\\ 16 maps of\\ $140\times124$};
 \foreach \i/\j in {in/ph,ph/bb,bb/res,res/post,post/out} \draw[arr] (\i)--(\j);
 \node[draw=cgray, dashed, rounded corners=2pt, anchor=north, align=center, text width=160mm, inner sep=4pt] at ($(in.west)!0.5!(out.east)+(0,-14mm)$) {\textbf{Fixed for every network:} leak-free split (last 18\% of each month, 12-h gap) $\cdot$ loss $0.40\,\mathcal{H}_{\log}+0.25\,G+0.15\,E+0.20\,(1-\rho)$ $\cdot$ one recipe (AdamW, one-cycle, 16 epochs, EMA) $\cdot$ the same 214 validation windows and decision rules};
 \end{tikzpicture}
@@ -239,7 +239,7 @@ and the wind speed $\|\mathbf{u}_{10}\|$. Low values of $V$ indicate stagnant ai
 \begin{equation}
 A = -\bigl(u\,\partial_x + v\,\partial_y\bigr)\log(1+C),
 \end{equation}
-from centred differences. Earlier models used the same physics in other forms: ConvLSTM shifted the \PM{} map along the wind (a semi-Lagrangian step \cite{staniforth1991}), and FMG-WACLU added wind direction and divergence, since converging wind ($\nabla\cdot\mathbf{u}<0$) traps pollution.
+from centered differences. Earlier models used the same physics in other forms: ConvLSTM shifted the \PM{} map along the wind (a semi-Lagrangian step \cite{staniforth1991}), and FMG-WACLU added wind direction and divergence, since converging wind ($\nabla\cdot\mathbf{u}<0$) traps pollution.
 
 \textbf{Time.} A window-local tendency $\Delta_t\log(1+C)$, divided by its per-cell spread, separates building from clearing episodes. The test windows carry no clock, so each window's start hour is estimated by matching its mean sunlight and temperature to hourly templates from training; this is exact for 60.7\% of validation windows and right within one hour for 97.7\%, and validation uses the estimate exactly as the test does. The hour enters as $(\sin,\cos)$, with the departure of $\log(1+C)$ from the cell's usual value at that hour, which mirrors the STL residual that defines an episode.
 
@@ -291,14 +291,14 @@ ConvLSTM & 19.0M & ConvLSTM over the inputs, spectral block, wind-shift advectio
 \node[font=\small\bfseries, text=cafno, anchor=west] at (-1.4,1.05) {AFNO V4 (6.98M parameters)};
 \node[b, fill=cafno!8] (a0) at (0,0) {10 hours $\times$ 20 ch};
 \node[b, fill=cafno!8, right=of a0] (a1) {each hour encoded alone\\ (shared conv blocks\\ 64, 128, 256)};
-\node[b, fill=cafno!8, right=of a1] (a2) {AFNO block at $35{\times}31$,\\ 6 AFNO blocks\\ at $18{\times}16$};
+\node[b, fill=cafno!8, right=of a1] (a2) {AFNO block at $35\times31$,\\ 6 AFNO blocks\\ at $18\times16$};
 \node[b, fill=cafno!8, right=of a2] (a3) {temporal translator\\ (1-D inception)\\ 10 $\to$ 16 hours};
 \node[b, fill=cafno!8, right=of a3] (a4) {2 AFNO blocks\\ per lead hour\\ + lead embedding};
 \node[b, fill=cafno!8, right=of a4] (a5) {U-Net decoder;\\ skips fuse the last\\ hour and the mean};
 \foreach \i/\j in {a0/a1,a1/a2,a2/a3,a3/a4,a4/a5} \draw[arr] (\i)--(\j);
 \node[font=\small\bfseries, text=cres, anchor=west] at (-1.4,-1.35) {ResGRU-UNet (7.12M parameters)};
 \node[b, fill=cres!8] (r0) at (0,-2.4) {10 hours $\times$ 20 ch\\ folded into 200 ch};
-\node[b, fill=cres!8, right=of r0] (r1) {conv U-Net encoder\\ 64, 128, 256\\ down to $18{\times}16$};
+\node[b, fill=cres!8, right=of r0] (r1) {conv U-Net encoder\\ 64, 128, 256\\ down to $18\times16$};
 \node[b, fill=cres!8, right=of r1] (r2) {bottleneck\\ conv block\\ (256 ch)};
 \node[b, fill=cres!8, right=of r2] (r3) {ConvGRU unrolled\\ for 16 lead hours\\ (constant input)};
 \node[b, fill=cres!8, right=of r3] (r4) {decoder per lead hour\\ with full-resolution\\ skips};
@@ -315,7 +315,7 @@ ConvLSTM & 19.0M & ConvLSTM over the inputs, spectral block, wind-shift advectio
 \begin{equation}
 \mathcal{A}(\mathbf{z}) = \mathbf{z} + \mathrm{FFT}_2^{-1}\Bigl(S_\lambda\bigl(W_2\,\mathrm{ReLU}(W_1\hat{\mathbf{z}}+\mathbf{b}_1)+\mathbf{b}_2\bigr)\Bigr),
 \end{equation}
-with $\lambda=0.01$ and the ReLU applied to the real and imaginary parts separately \cite{guibas2022afno}. An AFNO block computes $\mathbf{x}\leftarrow\mathbf{x}+\mathcal{A}(\mathrm{GN}(\mathbf{x}))$, then $\mathbf{x}\leftarrow\mathbf{x}+\mathrm{MLP}(\mathrm{GN}(\mathbf{x}))$ with a $1\times1$ MLP of width $2d$ and GroupNorm GN. Every block sees the whole map, and the FFT treats opposite edges as neighbours.
+with $\lambda=0.01$ and the ReLU applied to the real and imaginary parts separately \cite{guibas2022afno}. An AFNO block computes $\mathbf{x}\leftarrow\mathbf{x}+\mathcal{A}(\mathrm{GN}(\mathbf{x}))$, then $\mathbf{x}\leftarrow\mathbf{x}+\mathrm{MLP}(\mathrm{GN}(\mathbf{x}))$ with a $1\times1$ MLP of width $2d$ and GroupNorm GN. Every block sees the whole map, and the FFT treats opposite edges as neighbors.
 
 \textbf{ConvGRU.} The bottleneck feature $\mathbf{x}$ is fed at every lead hour $k$ and a hidden state $\mathbf{h}_k$ is updated with $3\times3$ convolutions $*$ \cite{ballas2016convgru}:
 \begin{align}
@@ -325,7 +325,7 @@ with $\lambda=0.01$ and the ReLU applied to the real and imaginary parts separat
 \end{align}
 starting from $\mathbf{h}_0=\mathbf{x}$, with GroupNorm inside each gate. The recurrence runs over lead time, not over the input hours: the inputs enter once, through the stacked channels, and each $\mathbf{h}_{k}$ is decoded with the encoder's skips into the change for lead hour $k$.
 
-\textbf{Other networks.} FMG-WACLU is a ConvLSTM U-Net that adds wind speed, direction and divergence and gates its features with weather rolled forward by a second ConvLSTM. ConvLSTM reads the 10 input hours recurrently at full resolution, adds an FNO-style spectral block, and shifts the \PM{} map along the wind; 88\% of its 19.0M parameters sit in the two spectral blocks of its bottleneck. Patch AFNO cuts the map into $4\times4$ patches, mixes them with AFNO blocks and maps each patch back with one linear layer.
+\textbf{Other networks.} FMG-WACLU is a ConvLSTM U-Net that adds wind speed, direction and divergence and gates its features with weather rolled forward by a second ConvLSTM. ConvLSTM reads the 10 input hours recurrently at full resolution, adds an FNO-style spectral block, and shifts the \PM{} map along the wind; 89\% of its 19.0M parameters sit in the two spectral blocks of its bottleneck. Patch AFNO cuts the map into $4\times4$ patches, mixes them with AFNO blocks and maps each patch back with one linear layer.
 
 \subsection{Training, Regularization and Calibration}
 \label{sec:training}
@@ -346,18 +346,18 @@ where $\mathcal{H}_{\log}$ is the Huber loss on $\log(1+y)$ with episode cells w
 \item gradient clipping, per-cell standardization with floors, and input clipping, against rare extreme values;
 \item averaging seeds \cite{lakshminarayanan2017}, which removes part of the variance between runs.
 \end{itemize}
-Even so, the training curves in Section~\ref{sec:ablation} show AFNO V4 fitting the training months more closely than ResGRU-UNet and doing worse on the held-out months.
+Even so, the training curves in Section~\ref{sec:ablation} show AFNO V4 fitting the training months more closely than ResGRU-UNet and doing worse on the held-out later hours of the same months.
 
 \textbf{Calibration.} After ensembling, each lead hour $h$ is multiplied by a factor fitted on validation to maximize the two SMAPE terms,
 \begin{equation}
 c_h = \arg\max_{c\,\in\,\{0.90,\,0.91,\,\dots,\,1.10\}} \tfrac12\Bigl[\bigl(1-\tfrac{G_h(c)}{2}\bigr) + \bigl(1-\tfrac{E_h(c)}{2}\bigr)\Bigr],
 \end{equation}
-where $G_h(c)$ and $E_h(c)$ are the SMAPE terms of hour $h$ after scaling by $c$. The fitted factors rise with lead time from 1.00 to between 1.08 and 1.10, as the episode argument in Section~\ref{sec:theory} predicts. We also fit them on three months and test on the fourth (leave one month out), to report calibration without using the scored month.
+where $G_h(c)$ and $E_h(c)$ are the SMAPE terms of hour $h$ after scaling by $c$. The fitted factors rise with lead time from 1.00 or 1.01 to between 1.08 and 1.10, as the episode argument in Section~\ref{sec:theory} predicts. We also fit them on three months and test on the fourth (leave one month out), to report calibration without using the scored month. For ResGRU-UNet the last hours reach 1.10, the top of the grid, so its best factors may be slightly larger.
 
 \section{Experimental Protocol}
 \label{sec:setup}
 \subsection{Validation without Leaks}
-A window spans 26 hours (10 in, 16 out). Two windows whose starts differ by $s$ hours share $(26-s)/26$ of their hours, so with a random split almost every validation window has a training neighbour that shares 24 or 25 of its hours, including most of its answers \cite{roberts2017}. Our early iterations used such a split and their validation scores were inflated. We hold out the last 18\% of every month, leave a 12-hour gap before it, and validate on 214 windows (stride 2: 52 from April and 54 from each other month); training uses the 2{,}257 earlier windows. Every model is scored on the same 214 windows.
+A window spans 26 hours (10 in, 16 out). Two windows whose starts differ by $s$ hours share $(26-s)/26$ of their hours, so with a random split almost every validation window has a training neighbor that shares 24 or 25 of its hours, including most of its answers \cite{roberts2017}. Our early iterations used such a split and their validation scores were inflated. We hold out the last 18\% of every month, leave a 12-hour gap between the end of the last training window and the first validation hour, so that no validation window shares an hour with a training window, and validate on 214 windows (stride 2: 52 from April and 54 from each other month); training uses the 2{,}257 earlier windows. Every model is scored on the same 214 windows.
 
 \subsection{Regression Metrics}
 With errors $e_i=\hat{y}_i-y_i$ over all $n = 5.9\times10^7$ validation values,
@@ -372,9 +372,9 @@ Persistence repeats the last input hour for all 16 hours, and seasonal naive use
 
 \subsection{Statistical Analysis}
 \label{sec:stats}
-\textbf{Seeds.} Each finalist was trained with five seeds (42, 1337, 1, 2 and 3). We report the mean and standard deviation of the single seeds, the five-seed ensemble, and the 25 pairwise comparisons between the seeds of the two families.
+\textbf{Seeds.} Each finalist was trained with five seeds (42, 1337, 1, 2 and 3). We report the mean and standard deviation of the single seeds, the five-seed ensemble (the mean of the five forecasts in \ugm), and the 25 pairwise comparisons between the seeds of the two families.
 
-\textbf{Block bootstrap.} Validation windows overlap in time, so they are not independent. For the gap between the two ensembles we resample blocks of 13 consecutive windows (26 hours, the span of one window) within each month, which gives 4 blocks in April and 5 in each other month, and recompute the score of both ensembles on each of 2{,}000 resamples \cite{kunsch1989}. We report the 2.5 and 97.5 percentiles of the gap.
+\textbf{Block bootstrap.} Validation windows overlap in time, so they are not independent. For the gap between the two ensembles we resample blocks of 13 consecutive windows (26 hours, the span of one window) within each month, which gives 4 blocks in April and 5 in each other month (the last holding 2 windows), and recompute the score of both ensembles on each of 2{,}000 resamples \cite{kunsch1989}. We report the 2.5 and 97.5 percentiles of the gap.
 
 \textbf{Rank test.} If the ten seeds of the two families were exchangeable, each split of their ten scores into two groups of five would be equally likely, so the chance that the five seeds of one named family take the five top places is $1/\binom{10}{5}=1/252\approx0.004$. This is the exact one-sided Mann-Whitney test with $U=25$.
 
@@ -388,12 +388,12 @@ Every training run and every main analysis was first run on synthetic data on a 
 
 \section{Results}
 \label{sec:results}
-\subsection{Finding 1: The Pipeline Matters More Than the Network}
-Table~\ref{tab:samepipe} shows the same network in its own earlier pipeline and in the shared pipeline: each of the three networks whose original runs are known gained 0.025 to 0.031 on the test set. Moving ResGRU-UNet from iteration 2 into the V4 pipeline raised its test score from 0.8506 to 0.8798 (+0.0292, one seed, no calibration). At the same setting the gap to AFNO V4 is +0.0036, or +0.0045 averaged over five seeds. The pipeline therefore moved the score 6 to 8 times more than the choice between the two best networks (4.4 times against the full-recipe gap of +0.0066).
+\subsection{Finding 1: The Pipeline Gain Exceeds the Gap Between the Best Networks}
+Table~\ref{tab:samepipe} shows the same network in its own earlier pipeline and in the shared pipeline: each of the three networks whose original runs are known gained 0.025 to 0.031 on the test set. Moving ResGRU-UNet from iteration 2 into the V4 pipeline raised its test score from 0.8506 to 0.8798 (+0.0292, one seed, no calibration). At the same setting the gap to AFNO V4 is +0.0036, or +0.0045 averaged over five seeds, so the pipeline moved the score 6.5 to 8.1 times more than the choice between the two best networks (4.4 times against the full-recipe gap of +0.0066). The ratio depends on the baseline and the network. From the fine-tuned ResGRU-UNet of iteration 3 (0.8594), the gain is +0.0204, or 4.5 to 5.7 times the gap; for FMG-WACLU and patch AFNO it is 5.4 to 6.8 and 6.9 to 8.7 times. The finding holds for networks of similar quality: across all five networks the round-one test scores span 0.0346 (Table~\ref{tab:round1}), more than any single pipeline gain.
 
 \begin{table}[!htb]
 \centering
-\caption{The same network in its own pipeline and in the V4 pipeline (held-out test; V4 pipeline: seed 42, no ensemble or calibration). Each gain bundles every pipeline change, and for patch AFNO also its bug fix}
+\caption{The same network in its own pipeline and in the V4 pipeline (held-out test; V4 pipeline: seed 42, no ensemble or calibration). Each gain bundles every pipeline change. For patch AFNO it also includes a bug fix, and for ResGRU-UNet the fix of an hour-of-day mismatch at test time (Appendix~\ref{sec:history})}
 \label{tab:samepipe}
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -406,7 +406,7 @@ patch AFNO & 0.8218 & 0.8530 & +0.0312 \\
 \end{tabular}
 \end{table}
 
-The pipeline gain bundles several changes that we did not separate for these three networks. For AFNO V4 itself, the last pipeline step can be split, because its intermediate forecasts were scored (Table~\ref{tab:v4steps}). Its test gain over V3 (+0.0224) splits into +0.0147 from the per-seed changes (physics channels, multiscale block, lead-hour weights), +0.0024 from the two-seed ensemble and +0.0054 from calibration, or 65\%, 10\% and 24\%. Even the smallest of these steps is close to the one-seed gap between the two best networks.
+The pipeline gain bundles several changes that we did not separate for these three networks. For AFNO V4 itself, the last pipeline step can be split, because its intermediate forecasts were scored (Table~\ref{tab:v4steps}). Its test gain over V3, the previous version of the pipeline (Appendix~\ref{sec:history}), is +0.0224. It splits into +0.0147 from the per-seed changes (physics channels and lead-hour weights, together with the multiscale block, which changes the network), +0.0024 from the two-seed ensemble and +0.0054 from calibration, or 65\%, 10\% and 24\%. Even the smallest of these steps, the two-seed ensemble, is two thirds of the one-seed gap between the two best networks.
 
 \begin{table}[!htb]
 \centering
@@ -424,7 +424,7 @@ V3 (one model, no blend) & 0.8609 & \\
 \end{tabular}
 \end{table}
 
-\subsection{Finding 2: Inside One Pipeline, the Convolutional-Recurrent U-Net Wins}
+\subsection{Finding 2: The Convolutional-Recurrent U-Net Wins in One Pipeline}
 \label{sec:finding2}
 Table~\ref{tab:round1} gives round one with the three terms of the score. ResGRU-UNet leads on all three terms, and validation and test order the five networks the same way. Under the rule, ResGRU-UNet is better than AFNO V4 (+0.0048 validation, +0.0036 test), FMG-WACLU ties with it, and patch AFNO and ConvLSTM are worse. The terms show where the weaker networks lose: patch AFNO's global SMAPE is better than AFNO V4's, but its episode terms are much worse, and ConvLSTM has the worst episode SMAPE of all.
 
@@ -446,18 +446,18 @@ ConvLSTM & 7 & 0.2169 & 0.3282 & 0.9120 & 0.8945 & 0.8452 \\
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:twoseed} gives the second stage. With two seeds ResGRU-UNet again leads: the two-seed means score 0.9175 against 0.9131 on validation and 0.8817 against 0.8779 on test, and with calibration 0.9198 against 0.9143 on validation (in sample) and 0.8898 against 0.8833 on test.
+Table~\ref{tab:twoseed} gives the second stage. With two seeds ResGRU-UNet again leads: the two-seed ensembles score 0.9175 against 0.9131 on validation and 0.8817 against 0.8779 on test, and with calibration 0.9198 against 0.9143 on validation (in sample) and 0.8898 against 0.8833 on test.
 
 \begin{table}[!htb]
 \centering
-\caption{Two seeds (42 and 1337) per finalist. Calibration on validation is in sample}
+\caption{Two-seed ensembles (seeds 42 and 1337) per finalist. Calibration on validation is in sample}
 \label{tab:twoseed}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
  & \multicolumn{2}{c}{Validation} & \multicolumn{2}{c}{Test} \\
 \cmidrule(lr){2-3}\cmidrule(l){4-5}
- & mean & + cal. & mean & + cal. \\
+ & ens. & + cal. & ens. & + cal. \\
 \midrule
 AFNO V4 & 0.91311 & 0.91430 & 0.8779 & 0.8833 \\
 ResGRU-UNet & 0.91747 & 0.91982 & 0.8817 & 0.8898 \\
@@ -466,7 +466,7 @@ Gap & +0.00436 & +0.00552 & +0.0038 & +0.0065 \\
 \end{tabular}
 \end{table}
 
-Five seeds give Table~\ref{tab:fiveseed} and Fig.~\ref{fig:seeds}; Table~\ref{tab:seeds} in Appendix~\ref{app:supp} lists every seed. The validation gap between the five-seed means is $+0.00479$, with a 95\% block-bootstrap interval of $[+0.00383, +0.00578]$; every one of the 2{,}000 resamples favours ResGRU-UNet. The gap between the single-seed means is $+0.00484$ $[+0.00386, +0.00584]$. Every ResGRU-UNet seed beats every AFNO V4 seed on validation, on the private test and on the public test (25 of 25 pairs each); its worst seed (0.8788 test) beats AFNO V4's best (0.8767), and on the public part its worst (0.8924) beats AFNO V4's best (0.8882). The exact rank test of Section~\ref{sec:stats} gives $p\approx0.004$ on each of the three.
+Five seeds give Table~\ref{tab:fiveseed} and Fig.~\ref{fig:seeds}; Table~\ref{tab:seeds} in Appendix~\ref{app:supp} lists every seed. The validation gap between the five-seed ensembles is $+0.00479$, with a 95\% block-bootstrap interval of $[+0.00383, +0.00578]$; every one of the 2{,}000 resamples favors ResGRU-UNet. The gap between the single-seed means is $+0.00484$ $[+0.00386, +0.00584]$. Every ResGRU-UNet seed beats every AFNO V4 seed on validation, on the private test and on the public test (25 of 25 pairs each); its worst seed (0.8788 test) beats AFNO V4's best (0.8767), and on the public part its worst (0.8924) beats AFNO V4's best (0.8882). The exact rank test of Section~\ref{sec:stats} gives $p\approx0.004$ on each of the three.
 
 \begin{table}[!htb]
 \centering
@@ -479,11 +479,11 @@ Five seeds give Table~\ref{tab:fiveseed} and Fig.~\ref{fig:seeds}; Table~\ref{ta
 \midrule
 Single seeds, val: mean & 0.91146 & 0.91630 & +0.00484 \\
 \quad standard deviation & 0.00059 & 0.00104 & \\
-5-seed mean, val & 0.91454 & 0.91933 & +0.00479 \\
+Five-seed ensemble, val & 0.91454 & 0.91933 & +0.00479 \\
 \ + calibration (one month out) & 0.91492 & 0.92097 & +0.00605 \\
 Single seeds, test: mean & 0.87540 & 0.87994 & +0.00454 \\
 \quad standard deviation & 0.00130 & 0.00085 & \\
-5-seed mean, test & 0.8793 & 0.8838 & +0.0045 \\
+Five-seed ensemble, test & 0.8793 & 0.8838 & +0.0045 \\
 \ + calibration, test & 0.8848 & \textbf{0.8914} & +0.0066 \\
 \bottomrule
 \end{tabular}
@@ -496,7 +496,7 @@ Single seeds, test: mean & 0.87540 & 0.87994 & +0.00454 \\
 \label{fig:seeds}
 \end{figure}
 
-\textbf{Agreement of validation and test.} Fig.~\ref{fig:valtest} plots validation against test for the 25 network forecasts that have both: the five round-one networks, the other eight single seeds, the eight ensembles with and without calibration, and the four ablations. The Pearson correlation is 0.96 and the Spearman rank correlation 0.93; with persistence and ridge added, the Pearson correlation is 0.99 over 27 forecasts. Validation is optimistic in level (it chose each run's best epoch and fitted the calibration) but it orders the forecasts much as the test does, which is what the decision rules require. On the test inputs, the two five-seed ensembles make similar forecasts: their log forecasts correlate at 0.996 and differ by 0.079 on average, about 8\%.
+\textbf{Agreement of validation and test.} Fig.~\ref{fig:valtest} plots validation against test for the 25 network forecasts that have both: the five round-one networks, the other eight single seeds, the eight ensembles with and without calibration, and the four ablations. With the calibrated ensembles scored in sample, the Pearson correlation is 0.96 and the Spearman rank correlation 0.93 (0.96 and 0.91 with the calibration month left out); with persistence and ridge added, the Pearson correlation is 0.99 over 27 forecasts. Validation is optimistic in level (it chose each run's best epoch and fitted the calibration) but it orders networks and ensembles much as the test does, which is what the decision rules require. It separates seeds of one network less reliably: over the five seeds of each finalist the Spearman correlation is 0.70 for AFNO V4 and 0.41 for ResGRU-UNet, and H1 (Section~\ref{sec:ablation}) raised validation but not the test score. On the test inputs, the two five-seed ensembles make similar forecasts: their log forecasts correlate at 0.996 and differ by 0.079 on average, about 8\%.
 
 \begin{figure}[!htb]
 \centering
@@ -508,7 +508,7 @@ Single seeds, test: mean & 0.87540 & 0.87994 & +0.00454 \\
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_lead_metrics.pdf}
-\caption{Validation MAE, RMSE and $R^2$ by lead hour (five-seed means, no calibration). ResGRU-UNet is best at every hour. Seasonal naive overtakes persistence from hour 8, when the daily cycle outweighs the last observed state.}
+\caption{Validation MAE, RMSE and $R^2$ by lead hour (five-seed ensembles, no calibration). ResGRU-UNet is best at every hour. Seasonal naive overtakes persistence from hour 8, when the daily cycle outweighs the last observed state.}
 \label{fig:lead}
 \end{figure*}
 
@@ -535,7 +535,7 @@ FMG-WACLU & 7.14 & 19.32 & 0.876 & 27.0\% & 0.9099 \\
 AFNO V4 & 7.31 & 20.17 & 0.865 & 23.8\% & 0.9110 \\
 ResGRU-UNet & 6.57 & 18.57 & 0.885 & 29.8\% & 0.9158 \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{Five-seed means}} \\
+\multicolumn{6}{@{}l}{\textit{Five-seed ensembles}} \\
 AFNO V4 & 6.99 & 19.45 & 0.874 & 26.5\% & 0.9145 \\
 \ + calibration & 7.76 & 20.90 & 0.855 & 21.0\% & 0.9149 \\
 ResGRU-UNet & \textbf{6.32} & 18.04 & 0.892 & 31.8\% & 0.9193 \\
@@ -582,7 +582,7 @@ ResGRU-UNet is first on all six measures in Fig.~\ref{fig:rank}, but the other f
 \label{fig:rank}
 \end{figure}
 
-Calibration raises the score but worsens MAE, RMSE and $R^2$ for both finalists (Fig.~\ref{fig:calib}): the ResGRU-UNet ensemble moves from MAE 6.32 to 7.12 while its score rises from 0.9193 to 0.9210. The factors push forecasts up, which the episode terms reward and absolute and squared errors penalize. The uncalibrated mean is the better model for MAE, RMSE and $R^2$; the calibrated one is better for the benchmark score. The ML + DL hybrid of Section~\ref{sec:hybrid} shows the same trade-off in reverse.
+Calibration raises the score but worsens MAE, RMSE and $R^2$ for both finalists (Fig.~\ref{fig:calib}): the ResGRU-UNet ensemble moves from MAE 6.32 to 7.12 while its score rises from 0.9193 to 0.9210. The factors push forecasts up, which the episode terms reward and absolute and squared errors penalize. The uncalibrated mean is the better model for MAE, RMSE and $R^2$; the calibrated one is better for the benchmark score. The hybrid of Section~\ref{sec:hybrid} shows the same trade-off in reverse.
 
 \begin{figure}[!htb]
 \centering
@@ -591,21 +591,21 @@ Calibration raises the score but worsens MAE, RMSE and $R^2$ for both finalists 
 \label{fig:calib}
 \end{figure}
 
-Fig.~\ref{fig:calibscales} in Appendix~\ref{app:supp} shows the fitted factors. They rise with lead time for both finalists and for every choice of fitting months, and they are larger for ResGRU-UNet (1.01 at hour 1 to 1.10 from hour 14) than for AFNO V4 (1.00 to 1.08). Leaving the scored month out costs little: 0.9210 against 0.9215 in sample for ResGRU-UNet and 0.9149 against 0.9158 for AFNO V4. The factors fitted without October are the largest, that is, October itself favours the smallest shift.
+Fig.~\ref{fig:calibscales} in Appendix~\ref{app:supp} shows the fitted factors. They rise with lead time for both finalists and for every choice of fitting months, and they are larger for ResGRU-UNet (1.01 at hour 1 to 1.10 from hour 14) than for AFNO V4 (1.00 to 1.08); 1.10 is the top of the grid. Leaving the scored month out costs little: 0.9210 against 0.9215 in sample for ResGRU-UNet and 0.9149 against 0.9158 for AFNO V4. The factors fitted without October are the largest, that is, October itself favors the smallest shift.
 
 \section{Analysis}
 \label{sec:analysis}
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_where.pdf}
-\caption{Five-seed means on validation. Left: mean SMAPE by true concentration. Middle: mean log bias (positive: too high). Right: score gap by month (ResGRU-UNet minus AFNO V4).}
+\caption{Five-seed ensembles on validation. Left: mean SMAPE by true concentration. Middle: mean log bias (positive: too high). Right: score gap by month (ResGRU-UNet minus AFNO V4).}
 \label{fig:where}
 \end{figure*}
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{fig_maps.pdf}
-\caption{Time-averaged validation maps. (a) Mean \PM. (b) Share of hours that are episodes. (c, d) MAE of persistence and of the ResGRU-UNet five-seed mean. (e) MAE difference, ResGRU-UNet minus AFNO V4. (f) $R^2$ of each cell's time series, ResGRU-UNet.}
+\caption{Time-averaged validation maps. (a) Mean \PM. (b) Share of hours that are episodes. (c, d) MAE of persistence and of the ResGRU-UNet five-seed ensemble. (e) MAE difference, ResGRU-UNet minus AFNO V4. (f) $R^2$ of each cell's time series, ResGRU-UNet.}
 \label{fig:maps}
 \end{figure*}
 
@@ -616,7 +616,7 @@ Fig.~\ref{fig:maps} maps the time-averaged errors. \PM{} and the errors of persi
 
 \subsection{Why It Wins: Ablations and Training Curves}
 \label{sec:ablation}
-We tested four hypotheses, each with one change to one finalist and one seed (Table~\ref{tab:ablations}), with predictions written down first. A change counts only if it moves validation by more than $\max(2\,\mathrm{sd}, 0.002)$ from its family's five-seed mean, which is 0.002 for AFNO V4 and 0.00208 for ResGRU-UNet:
+We tested four hypotheses, each with one change to one finalist and one seed (Table~\ref{tab:ablations}), with predictions written down first. A change counts only if it moves validation by more than $\max(2\,\mathrm{sd}, 0.002)$ from the mean of its family's five single seeds, which is 0.002 for AFNO V4 and 0.00208 for ResGRU-UNet:
 \begin{itemize}
 \item H1: AFNO V4's skips keep only the last hour and the mean;
 \item H2: the FFT wraps opposite edges of a non-periodic map;
@@ -627,12 +627,12 @@ None passes the threshold at one seed. H1 (skips that fuse all 10 hours, initial
 
 \begin{table}[!htb]
 \centering
-\caption{Single-change ablations (seed 42). $d$: validation change from the family's five-seed mean; $d/G$: share of the 0.00484 gap. Threshold 0.002 (AFNO V4) and 0.00208 (ResGRU-UNet)}
+\caption{Single-change ablations (seed 42). $d$: validation change from the mean of the family's five single seeds; $d/\Delta$: share of the gap $\Delta=0.00484$ between the two families. Threshold 0.002 (AFNO V4) and 0.00208 (ResGRU-UNet)}
 \label{tab:ablations}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lp{0.4\columnwidth}rrr@{}}
 \toprule
- & Change & $d$ & $d/G$ & Test \\
+ & Change & $d$ & $d/\Delta$ & Test \\
 \midrule
 H1 & AFNO V4, skips fuse all 10 hours & $+0.00113$ & $+0.23$ & 0.8748 \\
 H2 & AFNO V4, zero-padded FFT & $-0.00084$ & $-0.17$ & 0.8745 \\
@@ -642,7 +642,7 @@ H4 & ResGRU-UNet, ConvGRU replaced & $-0.00174$ & $-0.36$ & 0.8798 \\
 \end{tabular}
 \end{table}
 
-\textbf{A generalization gap.} The training curves (Fig.~\ref{fig:curves}; Table~\ref{tab:curves} in Appendix~\ref{app:supp}) show a pattern none of the AFNO changes altered. Every AFNO run reaches a lower training loss than ResGRU-UNet (0.053 to 0.054 against 0.064 to 0.068) but a higher validation loss: at a training loss of 0.09, its validation loss is 6.8\% higher on average. Its score peaks at epoch 4 or 5 and then falls by 0.009 to 0.010; ResGRU-UNet peaks at epoch 6 or 7 and falls by 0.003 to 0.005. Without its recurrence, ResGRU-UNet moves about 41\% of the way toward AFNO's validation loss. These observations are exploratory, but they suggest AFNO V4 fits the training months more and transfers less to new months. Its global, wrap-around spectral mixing, per-hour encoder and translator remain candidates for the cause.
+\textbf{A generalization gap.} The training curves (Fig.~\ref{fig:curves}; Table~\ref{tab:curves} in Appendix~\ref{app:supp}) show a pattern none of the AFNO changes altered. Every AFNO V4 run reaches a lower training loss than ResGRU-UNet (0.053 to 0.054 against 0.064 to 0.068) but a higher validation loss: at a training loss of 0.09, its validation loss is 6.8\% higher on average. Its score peaks at epoch 4 or 5 and then falls by 0.009 to 0.010; ResGRU-UNet peaks at epoch 6 or 7 and falls by 0.003 to 0.005. Without its recurrence, ResGRU-UNet moves about 41\% of the way toward AFNO V4's validation loss. These observations are exploratory, but they suggest AFNO V4 fits the training hours more and transfers less well to the later, held-out hours of the same months. Its global, wrap-around spectral mixing, per-hour encoder and translator remain candidates for the cause.
 
 \begin{figure}[!htb]
 \centering
@@ -672,15 +672,15 @@ Pooled & 214 & 0.9193 & 0.9051 & 0.235 & 0.305 & 6.32 & 6.42 & 18.04 & 17.75 & 0
 \end{tabular}
 \end{table*}
 
-\subsection{An ML + DL Hybrid}
+\subsection{A Hybrid with Gradient Boosting}
 \label{sec:hybrid}
-We tested whether a classical model can correct the network. A LightGBM model \cite{ke2017lightgbm} predicts the error of the uncalibrated ResGRU-UNet five-seed ensemble in $\log(1+y)$, and the forecast is shifted by it. It uses 33 features per cell and lead hour: the 20 input channels at the last hour, $\log(1+y)$ at the nine earlier hours, the ensemble forecast, its change from the last hour, the spread of the five seeds, and the lead hour. One model serves all lead hours; it is fitted on every fourth cell in each direction (about 2.8 million rows per fold) with fixed settings: Huber loss ($\alpha=0.5$), 300 trees, learning rate 0.05, 31 leaves, at least 500 rows per leaf, row and feature subsampling 0.8, and L2 penalty 10. The rule was written before the run: fit on the validation windows of three months and predict the fourth, for all four months, and call the hybrid better only if its pooled score is higher and it wins in at least three months; only then would it be fitted on all four months and scored on the test set.
+We tested whether a classical model can correct the network. A LightGBM model \cite{ke2017lightgbm} predicts the error of the uncalibrated ResGRU-UNet five-seed ensemble in $\log(1+y)$, and the forecast is shifted by it. It uses 33 features per cell and lead hour: the 20 input channels at the last hour, $\log(1+y)$ at the nine earlier hours, the ensemble forecast, its change from the last hour, the spread of the five seeds, and the lead hour. One model serves all lead hours and is fitted on every fourth cell in each direction, about 2.8 million rows per fold. Its settings are fixed: Huber loss ($\alpha=0.5$), 300 trees, learning rate 0.05, 31 leaves, at least 500 rows per leaf, row and feature subsampling 0.8, and L2 penalty 10. The rule was written before the run: fit on the validation windows of three months and predict the fourth, for all four months, and call the hybrid better only if its pooled score is higher and it wins in at least three months; only then would it be fitted on all four months and scored on the test set.
 
-The hybrid did not improve the score. It scores lower in all four held-out months and 0.9051 against 0.9193 pooled (Table~\ref{tab:hybrid}; Fig.~\ref{fig:hybrid} in Appendix~\ref{app:supp}). RMSE and $R^2$ improve slightly pooled (17.75 against 18.04; 0.895 against 0.892) and MAE is slightly worse (6.42 against 6.32), but episode SMAPE rises from 0.235 to 0.305. The regression gains are not uniform: RMSE falls in April and October and rises in July and December. This is the calibration trade-off in reverse, and it fits the theory of Section~\ref{sec:theory}: a symmetric loss in log space pulls forecasts toward the typical value, which removes the upward shift that the episode terms reward. The mean correction is 0.072 in log, about 7\%. The model relied most on the forecast's change from the last hour and on the seed spread (15\% and 13\% of its split gain), then on location, the ensemble forecast itself and the cell's climatology. The rule allowed a test submission only after a win. After the verdict, the hybrid was fitted on all four months and scored on the test set once, for the record: 0.8608, against 0.8838 for the uncalibrated ensemble it corrects (public part: 0.8775 against 0.8975). The test result agrees with the validation verdict.
+The hybrid does not improve the score. It scores lower in all four held-out months and 0.9051 against 0.9193 pooled (Table~\ref{tab:hybrid}; Fig.~\ref{fig:hybrid} in Appendix~\ref{app:supp}). RMSE and $R^2$ improve slightly pooled (17.75 against 18.04; 0.895 against 0.892) and MAE is slightly worse (6.42 against 6.32), but episode SMAPE rises from 0.235 to 0.305. The regression gains are not uniform: RMSE falls in April and October and rises in July and December. This is the calibration trade-off in reverse, and it fits the theory of Section~\ref{sec:theory}: a symmetric loss in log space pulls forecasts toward the typical value, which removes the upward shift that the episode terms reward. The mean correction is 0.072 in log, about 7\%. The model relied most on the forecast's change from the last hour and on the seed spread (15\% and 13\% of its split gain), then on location, the ensemble forecast itself and the cell's climatology. The rule allowed a test submission only after a win. After the verdict, the hybrid was fitted on all four months and scored on the test set once, for the record: 0.8608, against 0.8838 for the uncalibrated ensemble it corrects (public part: 0.8775 against 0.8975). The test result agrees with the validation verdict.
 
 \subsection{What the Linear Model Learned}
 \label{sec:ridge}
-The ridge baseline is the classical reference, and its weights show what a linear forecaster takes from the same inputs. The penalty hardly matters up to $10^2$ (Table~\ref{tab:ridgegrid} in Appendix~\ref{app:supp}); the chosen $\lambda=10^{-2}$ scores 0.8637 and zero weights give persistence's 0.8515 exactly, as they must. The inputs are standardized per cell, so the weights are comparable (Fig.~\ref{fig:ridge} in Appendix~\ref{app:supp}). The weight on the last hour's \PM{} goes from $+0.09$ at hour 1 to $-1.72$ at hour 13, so the forecast relaxes from the last value as the lead grows. The diurnal anomaly (up to $+0.82$), \PM{} one hour earlier ($-0.19$ to $+0.57$), \PM{} nine and eight hours earlier (up to $+0.39$ and down to $-0.20$) and the tendency (up to $+0.13$) take the next largest weights; the other 23 weights stay within $\pm0.11$. The inputs are correlated, so single weights should not be read as causal effects. The linear model gains on persistence overall but loses on episode cells (Table~\ref{tab:episode}), and on the test set it barely improves on persistence; the gap from ridge (0.8637) to the networks (0.8945 to 0.9158) measures what nonlinear spatial modelling adds within the same pipeline.
+The ridge baseline is the classical reference, and its weights show what a linear forecaster takes from the same inputs. The penalty hardly matters up to $10^2$ (Table~\ref{tab:ridgegrid} in Appendix~\ref{app:supp}); the chosen $\lambda=10^{-2}$ scores 0.8637 and zero weights give persistence's 0.8515 exactly, as they must. The inputs are standardized per cell, so the weights are comparable (Fig.~\ref{fig:ridge} in Appendix~\ref{app:supp}). The weight on the last hour's \PM{} goes from $+0.09$ at hour 1 to $-1.72$ at hour 13, so the forecast relaxes from the last value as the lead grows. The next largest weights belong to the diurnal anomaly (up to $+0.82$) and to \PM{} one hour earlier ($-0.19$ to $+0.57$). \PM{} nine hours earlier reaches $+0.39$, \PM{} eight hours earlier $-0.20$ and the tendency $+0.13$; the other 23 weights stay within $\pm0.11$. The inputs are correlated, so single weights should not be read as causal effects. The linear model gains on persistence overall but loses on episode cells (Table~\ref{tab:episode}), and on the test set it barely improves on persistence; the gap from ridge (0.8637) to the networks (0.8945 to 0.9158) measures what nonlinear spatial modeling adds within the same pipeline.
 
 \subsection{Cost}
 \label{sec:cost}
@@ -707,13 +707,13 @@ ConvLSTM & 19.0M & 69 & 19 & & \\
 \section{Discussion}
 \label{sec:discussion}
 \subsection{Why the Pipeline Dominates}
-The pipeline determines the starting point of every network. With the persistence residual and a zero-initialized head, an untrained network already scores 0.8515 on validation, and the best single network adds 0.064 to that. The pipeline changes act on every network at once: a validation split that measures what the test measures, inputs that carry the transport and mixing physics, a loss that matches the score, and post-processing that the score rewards. The network then determines how much of the remaining error is learned. With 2{,}257 training windows from four months, the data limit how much any architecture can show; Table~\ref{tab:v4steps} shows that even the smallest pipeline step, a two-seed ensemble, moved the test score about as much as the choice between the two best networks at one seed. The practical consequence is that networks should be compared only after the pipeline has been fixed.
+The pipeline determines the starting point of every network. With the persistence residual and a zero-initialized head, an untrained network already scores 0.8515 on validation, and the best single network adds 0.064 to that. The pipeline changes act on every network at once: a validation split that measures what the test measures, inputs that carry the transport and mixing physics, a loss that matches the score, and post-processing that the score rewards. The network then determines how much of the remaining error is learned. With 2{,}257 training windows from four months, the data limit how much any architecture can show; Table~\ref{tab:v4steps} shows that even the smallest pipeline step, a two-seed ensemble, moved the test score two thirds as much as the choice between the two best networks at one seed. The practical consequence is that networks should be compared only after the pipeline has been fixed.
 
-\subsection{Local Mixing Suits This Problem}
-In 16 hours, \PM{} moves about 10 to 12 cells at the mean and RMS winds (Appendix~\ref{app:cost}). A convolutional encoder with a recurrent core covers that radius; ResGRU-UNet's encoder alone reaches about 14 cells. AFNO mixes the whole map in every block and treats opposite edges as neighbours, which a non-periodic map of India does not need. The training curves show AFNO V4 fitting the training months more and doing worse on new months, and none of the three AFNO changes we tested closed the gap. These observations are consistent with a local inductive bias suiting a local transport problem, but they do not prove it: the ablations used one seed, and the candidate causes (global mixing, the per-hour encoder, the translator) were not all tested.
+\subsection{Local Mixing: A Hypothesis}
+In 16 hours, \PM{} moves about 10 to 12 cells at the mean and RMS winds (Appendix~\ref{app:cost}). A convolutional encoder with a recurrent core covers that radius; ResGRU-UNet's encoder alone reaches about 14 cells. AFNO mixes the whole map in every block and treats opposite edges as neighbors, which a non-periodic map of India does not need. One hypothesis is therefore that a local inductive bias suits a local transport problem. The evidence for it is weak and partly against it. The training curves show AFNO V4 fitting the training hours more closely and doing worse on the later, held-out hours of the same months, and none of the three AFNO V4 changes we tested closed the gap. But removing the wrap-around (H2) did not help, FMG-WACLU, a local ConvLSTM U-Net, did not beat AFNO V4, and ResGRU-UNet's recurrent core, which adds about 8 cells of reach per lead hour, covers most of the map by the last lead hours. The ablations used one seed, and the candidate causes (global mixing, the per-hour encoder, the translator) were not all tested.
 
-\subsection{Conditions That May Favour an Operator}
-We did not test conditions that could favour a global operator, and we list them as open questions rather than findings: longer horizons, where transport exceeds a convolutional receptive field; global or periodic domains, where the FFT's wrap-around is correct; and much larger training sets, where a weaker inductive bias costs less. Each of these is a direct extension of the present design, with the pipeline held fixed.
+\subsection{Conditions That May Favor an Operator}
+We did not test conditions that could favor a global operator: longer horizons, where transport exceeds a convolutional receptive field; global or periodic domains, where the FFT's wrap-around is correct; and much larger training sets, where a weaker inductive bias costs less. Each of these is a direct extension of the present design, with the pipeline held fixed.
 
 \subsection{Choosing the Metric}
 The benchmark score and the regression metrics disagree about the weaker networks and about calibration. This is expected when a point forecast is scored by different functions \cite{gneiting2011}: the episode terms reward an upward shift that absolute and squared errors penalize. The forecast should therefore be chosen for its use. A user who needs concentrations with small absolute error should take the uncalibrated ensemble; a user scored on episode detection, as the benchmark is, should take the calibrated one. For this reason we report both.
@@ -722,7 +722,7 @@ The benchmark score and the regression metrics disagree about the weaker network
 For controlled comparisons of spatio-temporal forecasters we suggest:
 \begin{itemize}
 \item fix the whole pipeline (inputs, split, loss, recipe, post-processing) and change only the network;
-\item validate on a temporal hold-out with a gap at least one window long, and check that validation orders forecasts as an untouched test does;
+\item validate on a temporal hold-out with a gap that keeps validation windows from sharing hours with training windows, and check that validation orders forecasts as an untouched test does;
 \item write the decision rule before each stage, run several seeds, and compare seeds pairwise and with a block bootstrap;
 \item report several metrics, including the raw-scale ones, and say which forecast is best for which;
 \item start every network at persistence with a residual output, so training only learns the departure from it.
@@ -732,7 +732,7 @@ For controlled comparisons of spatio-temporal forecasters we suggest:
 \label{sec:threats}
 \textbf{External validity.} The data are simulations, not measurements, and skill on WRF-Chem fields need not carry over to monitored \PM. Training covers one month per season of one year, and the test set comes from the following year on the same grid.
 
-\textbf{Internal validity.} The recipe was tuned for AFNO V4, which if anything favours it; ResGRU-UNet was not tuned. The later rounds were designed after round one's result. The pipeline gain bundles several changes that we did not separate for the three networks of Table~\ref{tab:samepipe}, and patch AFNO's gain includes its bug fix.
+\textbf{Internal validity.} The recipe was tuned for AFNO V4, which if anything favors it; ResGRU-UNet was not tuned. The later rounds were designed after round one's result. The pipeline gain bundles several changes that we did not separate for the three networks of Table~\ref{tab:samepipe}, patch AFNO's gain includes its bug fix, and ResGRU-UNet's the fix of an hour-of-day mismatch at test time. The step from V3 to V4 also added the multiscale block, which changes the network.
 
 \textbf{Construct validity.} The score's weights are not disclosed; we assume equal weights on validation. The score is a composite of relative error and correlation focused on episodes, so it does not measure raw-scale accuracy, which is why we also report MAE, RMSE and $R^2$.
 
@@ -740,12 +740,20 @@ For controlled comparisons of spatio-temporal forecasters we suggest:
 
 \section{Conclusion}
 \label{sec:conclusion}
-For 16-hour \PM{} forecasting over India, the pipeline mattered more than the network. Physics channels for mixing and transport, a log-space persistence residual, validation that reproduces the test, a loss matched to the score, and ensembling with calibration gave the same network a gain 6 to 8 times the gap between the two best networks. Inside one fixed pipeline, a plain convolutional-recurrent U-Net beat the Fourier neural operator (AFNO V4) on every seed pair, both parts of the test set, every lead hour, month and regression metric, and it is also cheaper to run. No single component we tested explains the gap; the Fourier model generalizes less well across months, which fits a transport problem that is local and not periodic. A gradient-boosted correction of the ensemble lowered squared error but not the benchmark score.
+For 16-hour \PM{} forecasting over India, the pipeline moved the score more than the choice between networks of similar quality. Physics channels for mixing and transport, a log-space persistence residual, validation that reproduces the test and a loss matched to the score raised the test score of each network by 0.025 to 0.031 at one seed (including two bug fixes), about 4 to 9 times the gap between the two best networks. Inside one fixed pipeline, a plain convolutional-recurrent U-Net beat the Fourier neural operator (AFNO V4) on every seed pair and both parts of the test set, and on validation at every lead hour, in every month and on every regression metric; it is also cheaper to run. No single component we tested explains the gap. A gradient-boosted correction of the ensemble lowered squared error but not the benchmark score.
 
 Four extensions remain open: separating the pipeline gain into its parts for each network; testing the same comparison on monitored \PM{} and at longer horizons; repeating the ablations with several seeds; and training a hybrid correction on the score's own terms, as the networks are.
 
 \section*{Reproducibility}
-The code is at \url{https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone}: the shared pipeline and every network (\texttt{src/}), the notebook builders and Kaggle tools (\texttt{scripts/}), the dry runs, port check and config test (\texttt{tests/}), six local notebooks with outputs (\texttt{notebooks/}; \texttt{notebooks/kaggle/} holds the Kaggle notebooks exactly as they ran, with their run logs), the study settings (\texttt{configs/}), the run records (\texttt{results/}), the AFNO V4 script and the original notebooks of the ported networks (\texttt{reference/}), and this paper with its figures (\texttt{paper/}). Every table and figure in this paper is built from the files in \texttt{results/}. The data are not included; see \texttt{data/README.md}. The five ResGRU-UNet networks, with their calibration factors and normalization statistics, are at \url{https://www.kaggle.com/models/imvetri0/resgru-unet-pm25}.
+The code is at \url{https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone}. It holds:
+\begin{itemize}
+\item the shared pipeline and every network (\texttt{src/});
+\item the notebook builders and Kaggle tools (\texttt{scripts/}) and the dry runs, port check and config test (\texttt{tests/});
+\item six notebooks with outputs (\texttt{notebooks/}), and the Kaggle notebooks exactly as they ran, with their run logs (\texttt{notebooks/kaggle/});
+\item the study settings (\texttt{configs/}) and the run records (\texttt{results/});
+\item the AFNO V4 script and the original notebooks of the ported networks (\texttt{reference/}), and this paper with its figures (\texttt{paper/}).
+\end{itemize}
+The tables and figures of Sections~\ref{sec:results} and~\ref{sec:analysis} and Appendices~\ref{app:arch} and~\ref{app:supp} are built from the files in \texttt{results/}. The data exploration (Section~\ref{sec:eda} and Appendix~\ref{app:eda}) comes from notebooks 01 and 02, and the episode statistics of Section~\ref{sec:theory} from an earlier analysis of the training data that is not part of the repository. The data are not included; see \texttt{data/README.md}. The five ResGRU-UNet networks, with their calibration factors and normalization statistics, are at \url{https://www.kaggle.com/models/imvetri0/resgru-unet-pm25}.
 
 \FloatBarrier
 \balance
@@ -757,34 +765,34 @@ The code is at \url{https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline
 \bibitem{shi2015convlstm} X. Shi, Z. Chen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Convolutional LSTM network: A machine learning approach for precipitation nowcasting,'' in \emph{Proc. NeurIPS}, 2015, pp. 802--810.
 \bibitem{ballas2016convgru} N. Ballas, L. Yao, C. Pal, and A. Courville, ``Delving deeper into convolutional networks for learning video representations,'' in \emph{Proc. ICLR}, 2016.
 \bibitem{wightman2021} R. Wightman, H. Touvron, and H. J\'{e}gou, ``ResNet strikes back: An improved training procedure in timm,'' arXiv:2110.00476, 2021.
-\bibitem{bello2021} I. Bello, W. Fedus, X. Du, E. D. Cubuk, A. Srinivas, T.-Y. Lin, J. Shlens, and B. Zoph, ``Revisiting ResNets: Improved training and scaling strategies,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 34, 2021.
-\bibitem{liu2022convnext} Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie, ``A ConvNet for the 2020s,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2022, pp. 11976--11986.
+\bibitem{bello2021} I. Bello, W. Fedus, X. Du, E. D. Cubuk, A. Srinivas, T.-Y. Lin, J. Shlens, and B. Zoph, ``Revisiting ResNets: Improved training and scaling strategies,'' in \emph{Proc. NeurIPS}, 2021.
+\bibitem{liu2022convnext} Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie, ``A ConvNet for the 2020s,'' in \emph{Proc. CVPR}, 2022, pp. 11976--11986.
 \bibitem{zeng2023} A. Zeng, M. Chen, L. Zhang, and Q. Xu, ``Are transformers effective for time series forecasting?'' in \emph{Proc. AAAI Conf. Artif. Intell.}, vol. 37, no. 9, 2023, pp. 11121--11128.
 \bibitem{kushwaha2025} A. Kushwaha and K. Gopalan, ``A comparison of lightweight deep learning models for particulate-matter nowcasting in the Indian subcontinent \& surrounding regions,'' arXiv:2511.11185, 2025.
-\bibitem{bedi2025conoair} S. Bedi, K. Tiwari, Prathosh A. P., S. H. Kota, N. M. A. Krishnan \emph{et al.}, ``CoNOAir: A neural operator for forecasting carbon monoxide evolution in cities,'' arXiv:2501.06007, 2025.
+\bibitem{bedi2025conoair} S. Bedi \emph{et al.}, ``CoNOAir: A neural operator for forecasting carbon monoxide evolution in cities,'' arXiv:2501.06007, 2025.
 \bibitem{pathak2022fourcastnet} J. Pathak \emph{et al.}, ``FourCastNet: A global data-driven high-resolution weather model using adaptive Fourier neural operators,'' arXiv:2202.11214, 2022.
 \bibitem{dang2025adaptfno} H. V. Dang, B. D. G. Nguyen, P. C. H. Nguyen, and T.-S. Hy, ``AdaptFNO: Adaptive Fourier neural operator with dynamic spectral modes and multiscale learning for climate modeling,'' in \emph{NeurIPS Workshop on Machine Learning and the Physical Sciences}, 2025.
-\bibitem{shi2017trajgru} X. Shi, Z. Gao, L. Lausen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Deep learning for precipitation nowcasting: A benchmark and a new model,'' in \emph{Proc. NeurIPS}, 2017.
+\bibitem{shi2017trajgru} X. Shi, Z. Gao, L. Lausen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Deep learning for precipitation nowcasting: A benchmark and a new model,'' in \emph{Proc. NeurIPS}, 2017, pp. 5617--5627.
 \bibitem{ronneberger2015unet} O. Ronneberger, P. Fischer, and T. Brox, ``U-Net: Convolutional networks for biomedical image segmentation,'' in \emph{Proc. MICCAI}, 2015, pp. 234--241.
 \bibitem{he2016} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. CVPR}, 2016, pp. 770--778.
 \bibitem{gao2022simvp} Z. Gao, C. Tan, L. Wu, and S. Z. Li, ``SimVP: Simpler yet better video prediction,'' in \emph{Proc. CVPR}, 2022, pp. 3170--3180.
 \bibitem{leinonen2021} J. Leinonen, ``Spatiotemporal weather data predictions with shortcut recurrent-convolutional networks: A solution for the Weather4cast challenge,'' arXiv:2111.02121, 2021.
 \bibitem{melis2018} G. Melis, C. Dyer, and P. Blunsom, ``On the state of the art of evaluation in neural language models,'' in \emph{Proc. ICLR}, 2018.
-\bibitem{lucic2018} M. Lucic, K. Kurach, M. Michalski, S. Gelly, and O. Bousquet, ``Are GANs created equal? A large-scale study,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 31, 2018, pp. 700--709.
+\bibitem{lucic2018} M. Lucic, K. Kurach, M. Michalski, S. Gelly, and O. Bousquet, ``Are GANs created equal? A large-scale study,'' in \emph{Proc. NeurIPS}, 2018, pp. 700--709.
 \bibitem{gneiting2011} T. Gneiting, ``Making and evaluating point forecasts,'' \emph{J. Amer. Statist. Assoc.}, vol. 106, no. 494, pp. 746--762, 2011.
 \bibitem{goodwin1999} P. Goodwin and R. Lawton, ``On the asymmetry of the symmetric MAPE,'' \emph{Int. J. Forecast.}, vol. 15, no. 4, pp. 405--408, 1999.
 \bibitem{roberts2017} D. R. Roberts \emph{et al.}, ``Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure,'' \emph{Ecography}, vol. 40, no. 8, pp. 913--929, 2017.
 \bibitem{kaufman2012} S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, ``Leakage in data mining: Formulation, detection, and avoidance,'' \emph{ACM Trans. Knowl. Discov. Data}, vol. 6, no. 4, Art. no. 15, 2012.
 \bibitem{kunsch1989} H. R. K\"{u}nsch, ``The jackknife and the bootstrap for general stationary observations,'' \emph{Ann. Statist.}, vol. 17, no. 3, pp. 1217--1241, 1989.
-\bibitem{bouthillier2021} X. Bouthillier \emph{et al.}, ``Accounting for variance in machine learning benchmarks,'' in \emph{Proc. Mach. Learn. Syst. (MLSys)}, vol. 3, 2021.
+\bibitem{bouthillier2021} X. Bouthillier \emph{et al.}, ``Accounting for variance in machine learning benchmarks,'' in \emph{Proc. MLSys}, 2021.
 \bibitem{hyndman2021} R. J. Hyndman and G. Athanasopoulos, \emph{Forecasting: Principles and Practice}, 3rd ed. Melbourne, Australia: OTexts, 2021.
 \bibitem{hoerl1970} A. E. Hoerl and R. W. Kennard, ``Ridge regression: Biased estimation for nonorthogonal problems,'' \emph{Technometrics}, vol. 12, no. 1, pp. 55--67, 1970.
 \bibitem{loshchilov2019} I. Loshchilov and F. Hutter, ``Decoupled weight decay regularization,'' in \emph{Proc. ICLR}, 2019.
-\bibitem{smith2019} L. N. Smith and N. Topin, ``Super-convergence: Very fast training of neural networks using large learning rates,'' in \emph{Proc. SPIE}, vol. 11006, 2019.
+\bibitem{smith2019} L. N. Smith and N. Topin, ``Super-convergence: Very fast training of neural networks using large learning rates,'' in \emph{Proc. SPIE}, vol. 11006, Art. no. 1100612, 2019.
 \bibitem{wu2018} Y. Wu and K. He, ``Group normalization,'' in \emph{Proc. ECCV}, 2018, pp. 3--19.
 \bibitem{polyak1992} B. T. Polyak and A. B. Juditsky, ``Acceleration of stochastic approximation by averaging,'' \emph{SIAM J. Control Optim.}, vol. 30, no. 4, pp. 838--855, 1992.
 \bibitem{lakshminarayanan2017} B. Lakshminarayanan, A. Pritzel, and C. Blundell, ``Simple and scalable predictive uncertainty estimation using deep ensembles,'' in \emph{Proc. NeurIPS}, 2017, pp. 6402--6413.
-\bibitem{ke2017lightgbm} G. Ke \emph{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 30, 2017, pp. 3146--3154.
+\bibitem{ke2017lightgbm} G. Ke \emph{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' in \emph{Proc. NeurIPS}, 2017, pp. 3146--3154.
 \bibitem{aisehack2026} ANRF AISEHack 2026, Phase 2, Theme 2: pollution forecasting (IIT Delhi), Kaggle, 2026. [Online]. Available: \url{https://www.kaggle.com/competitions/anrf-aise-hack-phase-2-theme-2-pollution-forecasting-iitd}
 \bibitem{cleveland1990} R. B. Cleveland, W. S. Cleveland, J. E. McRae, and I. Terpenning, ``STL: A seasonal-trend decomposition procedure based on loess,'' \emph{J. Off. Stat.}, vol. 6, no. 1, pp. 3--73, 1990.
 \bibitem{iyer2013} U. S. Iyer and P. E. Raj, ``Ventilation coefficient trends in the recent decades over four major Indian metropolitan cities,'' \emph{J. Earth Syst. Sci.}, vol. 122, no. 2, pp. 537--549, 2013.
@@ -809,16 +817,16 @@ Table~\ref{tab:monthstats} summarizes \PM{} in each training month and in the te
 \toprule
 Month & Mean & Median & 99th pct. & Max \\
 \midrule
-April 2016 & 22.4 & 16.2 & 119 & 2534 \\
+April 2016 & 22.4 & 16.2 & 119 & 2{,}534 \\
 July 2016 & 15.4 & 10.1 & 79 & 843 \\
-October 2016 & 37.2 & 24.7 & 183 & 2850 \\
-December 2016 & 59.1 & 23.7 & 366 & 1538 \\
-Test inputs (2017) & 34.5 & 16.9 & 232 & 1519 \\
+October 2016 & 37.2 & 24.7 & 183 & 2{,}850 \\
+December 2016 & 59.1 & 23.7 & 366 & 1{,}538 \\
+Test inputs (2017) & 34.5 & 16.9 & 232 & 1{,}519 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The memory of the field fades over the horizon. The autocorrelation of $\log(1+y)$ is 0.978 at a lag of one hour, 0.728 at 6 hours, 0.535 at 12 hours and 0.571 at 24 hours, where the daily cycle brings it back up. The standard deviation of its change grows from 0.101 after one hour to 0.286, 0.419, 0.485 and 0.505 after 4, 8, 12 and 16 hours. The mean 10-m wind is 4.24~m/s and its RMS 4.97~m/s, so \PM{} travels 244 to 286~km in 16 hours, or 9.8 to 11.5 cells. In the April files, the emission fields are nonzero in 4\% (biomass-burning NMVOC) to 98\% of cell-hours, with maxima from $8\times10^{-9}$ to $7\times10^{-6}$; at that scale and without stated units they were left out.
+The memory of the field fades over the horizon. The autocorrelation of $\log(1+y)$ is 0.978 at a lag of one hour, 0.728 at 6 hours, 0.535 at 12 hours and 0.571 at 24 hours, where the daily cycle brings it back up. The standard deviation of its change grows from 0.101 after one hour to 0.286, 0.419, 0.485 and 0.505 after 4, 8, 12 and 16 hours. The mean 10-m wind is 4.24~\si{\metre\per\second} and its RMS 4.97~\si{\metre\per\second}, so \PM{} travels 244 to 286~km in 16 hours, or 9.8 to 11.5 cells. In the April files, the emission fields are nonzero in 4\% (biomass-burning NMVOC) to 98\% of cell-hours, with maxima from $8\times10^{-9}$ to $7\times10^{-6}$; at that scale and without stated units they were left out.
 
 \section{Development History}
 \label{sec:history}
@@ -847,13 +855,13 @@ The pipeline of Sections~\ref{sec:method} and~\ref{sec:setup} was not designed a
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_pipeline_evolution.pdf}
-\caption{Held-out test score at each development iteration. The dashed line is persistence (0.7910). Iteration 5 rebuilt the pipeline on a leak-free split and scored below iteration 4; the rebuilt pipeline overtakes it from iteration 6.}
+\caption{Held-out test score at each development iteration. The dashed line is persistence (0.7910). Iteration 5 rebuilt the pipeline on a leak-free split and scored below iteration 4; the rebuilt pipeline overtakes it from iteration 7.}
 \label{fig:evolution}
 \end{figure*}
 
 \textbf{1 to 2: from patch AFNO to ResGRU-UNet.} The first models followed FourCastNet: AFNO on $4\times4$ patches, trained on a random split. They stalled below 0.83 on the test set. We attributed this to the global spectral layers acting as low-pass filters that blurred sharp spikes, and moved to a U-Net with full-resolution skips for local detail, a ConvGRU, and an output added to the last observed hour. The score rose to 0.8506. Later checks showed that this explanation was wrong. The patch model's spectral step applied the same complex matrix at every frequency, so apart from its soft threshold it was almost linear and local; a bug also discarded the imaginary half of every filtered spectrum; and each $4\times4$ patch was rebuilt by one linear layer with no skips. Three things had changed at once (the persistence residual, the skips and a log-space loss), and persistence alone is already strong.
 
-\textbf{2 to 4: shifting forecasts up.} The base ResGRU-UNet under-predicted peaks. We attributed this to losses that pull forecasts toward the centre and fine-tuned it in steps: a loss 20 times larger on under-predicted episode cells, then a pinball loss at the 0.75 quantile \cite{koenker1978}, then blends with models trained at the 0.85 and 0.90 quantiles. The test score rose at every step, from 0.8506 to 0.8648. This explanation was wrong, since SMAPE is symmetric in the log ratio (Section~\ref{sec:theory}), but the change helped for a different reason: episode cells are picked where the truth turned out high, so upward-shifted forecasts score better on the episode terms. Scaling forecasts by hand did not help. ``Physics multipliers'' that raised stagnant cells by 25\% and all other cells by 12\% lost 0.006, because the 98\% of background cells pay for the shift, and a geometric blend with an AFNO member lost 0.008. Grafting four physics channels onto trained weights failed with NaN values.
+\textbf{2 to 4: shifting forecasts up.} The base ResGRU-UNet under-predicted peaks. We attributed this to losses that pull forecasts toward the center and fine-tuned it in steps: a loss 20 times larger on under-predicted episode cells, then a pinball loss at the 0.75 quantile \cite{koenker1978}, then blends with models trained at the 0.85 and 0.90 quantiles. The test score rose at every step, from 0.8506 to 0.8648. This explanation was wrong, since SMAPE is symmetric in the log ratio (Section~\ref{sec:theory}), but the change helped for a different reason: episode cells are picked where the truth turned out high, so upward-shifted forecasts score better on the episode terms. Scaling forecasts by hand did not help. ``Physics multipliers'' that raised stagnant cells by 25\% and all other cells by 12\% lost 0.006, because the 98\% of background cells pay for the shift, and a geometric blend with an AFNO member lost 0.008. Grafting four physics channels onto trained weights failed with NaN values.
 
 \textbf{4 to 5: a leak-free split.} The random split gave an episode correlation near 0.98 for models that scored about 0.86 on the test set: with overlapping windows, it puts near-copies of every validation window into training. Iteration 5 held out the last 15 to 20\% of each month and rebuilt the model as AFNO with a SimVP-style temporal translator \cite{gao2022simvp}. Its best test score, 0.8561, came from a blend with ResGRU-UNet and was below iteration 4. The leak-free split did not raise the score, but it made model selection reliable. Selection still used the wrong target, however: a proxy episode mask that marked 0.30\% of validation cells against about 2\% for the official one, checkpoints chosen on the validation loss, and no gap between training and validation windows.
 
@@ -877,15 +885,15 @@ Table~\ref{tab:archdetail} lists the layers of the five networks as they ran in 
 \toprule
 Network & Input & Encoder & Mixing and temporal core & Decoder and output \\
 \midrule
-ResGRU-UNet & 10 hours $\times$ 20 channels stacked into 200 channels & ConvBlocks with 64, 128 and 256 channels at $140{\times}124$, $70{\times}62$ and $35{\times}31$; average pooling to $18{\times}16$; bottleneck ConvBlock (256) & ConvGRU ($3\times3$, 256 channels) unrolled for 16 steps with the bottleneck as constant input and initial state & per lead hour: $1\times1$ projection, three transposed-convolution steps with skips from all encoder levels (128, 64, 32 channels), $3\times3$ conv head \\
+ResGRU-UNet & 10 hours $\times$ 20 channels stacked into 200 channels & ConvBlocks with 64, 128 and 256 channels at $140\times124$, $70\times62$ and $35\times31$; average pooling to $18\times16$; bottleneck ConvBlock (256) & ConvGRU ($3\times3$, 256 channels) unrolled for 16 steps with the bottleneck as constant input and initial state & per lead hour: $1\times1$ projection, three transposed-convolution steps with skips from all encoder levels (128, 64, 32 channels), $3\times3$ conv head \\
 \addlinespace
-AFNO V4 & each of the 10 hours separately (20 channels) & shared ConvBlocks with 64, 128 and 256 channels; one AFNO block at $35{\times}31$; six AFNO blocks at $18{\times}16$ (8 blocks of channels, MLP ratio 2, $\lambda=0.01$) & translator over time per cell: two 1-D inception layers (kernels 1, 3, 5, 7), a transposed convolution from 10 to 16 hours, two more inception layers; lead-hour embedding; two AFNO blocks per lead hour & U-Net decoder (128, 64, 32); each skip is a $1\times1$ fusion of the last hour and the mean over the 10 hours; $3\times3$ conv head \\
+AFNO V4 & each of the 10 hours separately (20 channels) & shared ConvBlocks with 64, 128 and 256 channels; one AFNO block at $35\times31$; six AFNO blocks at $18\times16$ (8 blocks of channels, MLP ratio 2, $\lambda=0.01$) & translator over time per cell: two 1-D inception layers (kernels 1, 3, 5, 7), a transposed convolution from 10 to 16 hours, two more inception layers; lead-hour embedding; two AFNO blocks per lead hour & U-Net decoder (128, 64, 32); each skip is a $1\times1$ fusion of the last hour and the mean over the 10 hours; $3\times3$ conv head \\
 \addlinespace
 FMG-WACLU & 20 channels per hour plus wind speed, direction ($\sin$, $\cos$) and divergence & conv embedding (32); ConvLSTM over the 10 hours (128); a second ConvLSTM rolls the inputs forward 16 hours, and a third encodes the forecast fields; a sigmoid gate mixes the two states & ConvBlocks (64, 128) and bottleneck (128); ConvGRU (128) over the 16 lead hours & per lead hour: decoder (64, 32, 16) with skips, $3\times3$ conv head \\
 \addlinespace
-ConvLSTM & 20 channels plus the \PM{} map shifted along the wind by bilinear sampling & ConvLSTM over the 10 hours at full resolution (32), BatchNorm; U-Net encoder (32, 64, 128) & bottleneck with 256 channels and two FNO spectral blocks keeping $8\times8$ modes (88\% of the parameters) & decoder (128, 64, 32); the head outputs all 16 hours at once \\
+ConvLSTM & 20 channels plus the \PM{} map shifted along the wind by bilinear sampling & ConvLSTM over the 10 hours at full resolution (32), BatchNorm; U-Net encoder (32, 64, 128) & bottleneck with 256 channels and two FNO spectral blocks keeping $8\times8$ modes (89\% of the parameters) & decoder (128, 64, 32); the head outputs all 16 hours at once \\
 \addlinespace
-patch AFNO & 10 hours stacked; $4\times4$ patch embedding to 256 dimensions; $35{\times}31$ tokens with a learned position embedding & none & eight spectral blocks (4 heads; one complex matrix per head shared by all frequencies; MLP ratio 4; dropout 0.1) & linear projection of each token to $16\times4\times4$ values, then unpatchify \\
+patch AFNO & 10 hours stacked; $4\times4$ patch embedding to 256 dimensions; $35\times31$ tokens with a learned position embedding & none & eight spectral blocks (4 heads; one complex matrix per head shared by all frequencies; MLP ratio 4; dropout 0.1) & linear projection of each token to $16\times4\times4$ values, then unpatchify \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -922,7 +930,7 @@ ResGRU-UNet, H4 & ablation & 42 & 7{,}126{,}977 & 7 & 0.91456 & 197 & 53 \\
 \end{table}
 
 \subsection{Reach and Cost of the Operators}
-\textbf{How far must a forecast see.} At the mean wind of 4.24~m/s, \PM{} travels 244~km in 16 hours: 9.8 cells, or 11.5 cells at the RMS wind. Table~\ref{tab:opcost} compares the reach and cost of the main operators for $N$ cells, $d$ channels and kernel size $k$. A $3\times3$ convolution reaches one more cell per layer: ResGRU-UNet's encoder alone reaches about 14 cells, and each ConvGRU step at $18\times16$ adds about 8 more, so it covers the needed radius. AFNO mixes the whole map in every block, at a cost close to linear in $N$, but transport over 16 hours does not need global reach.
+At the mean wind of 4.24~\si{\metre\per\second}, \PM{} travels 244~km in 16 hours: 9.8 cells, or 11.5 cells at the RMS wind. Table~\ref{tab:opcost} compares the reach and cost of the main operators for $N$ cells, $d$ channels and kernel size $k$. A $3\times3$ convolution reaches one more cell per layer: ResGRU-UNet's encoder alone reaches about 14 cells, and each ConvGRU step at $18\times16$ adds about 8 more, so it covers the needed radius. AFNO mixes the whole map in every block, at a cost close to linear in $N$, but transport over 16 hours does not need global reach.
 
 \begin{table}[H]
 \centering
@@ -1002,7 +1010,7 @@ December & 0.9194 & 0.9249 & +0.0055 \\
 
 \begin{table}[H]
 \centering
-\caption{Five-seed ensembles by true concentration (\ugm): share of values, mean SMAPE and mean log bias (positive: too high)}
+\caption{Five-seed ensembles by true concentration (\ugm): share of values, mean SMAPE and mean log bias (positive: too high). AFNO: AFNO V4; ResGRU: ResGRU-UNet}
 \label{tab:bins}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrcccc@{}}
@@ -1106,7 +1114,7 @@ ResGRU-UNet, 5 seeds & 1.31 / 4.92 / 0.992 & 4.29 / 13.26 / 0.942 & 6.84 / 18.93
 \begin{figure*}[tp]
 \centering
 \includegraphics[width=\textwidth]{fig_hybrid.pdf}
-\caption{The ML + DL hybrid. (a) Score in each held-out month: the correction lowers it every time. (b) RMSE in each held-out month: lower in April and October, higher in July and December. (c) The twelve features with the largest share of LightGBM's split gain, from a fit on all four months.}
+\caption{The hybrid of the network and a gradient-boosted correction. (a) Score in each held-out month: the correction lowers it every time. (b) RMSE in each held-out month: lower in April and October, higher in July and December. (c) The twelve features with the largest share of LightGBM's split gain, from a fit on all four months.}
 \label{fig:hybrid}
 \end{figure*}
 
@@ -1143,7 +1151,7 @@ Decile & Cell mean & AFNO V4 & ResGRU-UNet & Difference \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{fig_case.pdf}
-\caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log colour scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
+\caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log color scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
 \label{fig:case}
 \end{figure}
 
@@ -1242,14 +1250,14 @@ Date & Forecast & Public & Private (test) \\
 \begin{figure*}[tp]
 \centering
 \includegraphics[width=\textwidth]{fig_terms_by_hour.pdf}
-\caption{The three terms of the benchmark score and the score itself by lead hour, on validation. Thin lines: single seeds; thick lines: five-seed means.}
+\caption{The three terms of the benchmark score and the score itself by lead hour, on validation. Thin lines: single seeds; thick lines: five-seed ensembles.}
 \label{fig:terms}
 \end{figure*}
 
 \begin{figure*}[tp]
 \centering
 \includegraphics[width=0.9\textwidth]{fig_smape_maps.pdf}
-\caption{Mean SMAPE per cell for the five-seed means of AFNO V4 (a) and ResGRU-UNet (b), and their difference (c). ResGRU-UNet is lower in 94.7\% of cells.}
+\caption{Mean SMAPE per cell for the five-seed ensembles of AFNO V4 (a) and ResGRU-UNet (b), and their difference (c). ResGRU-UNet is lower in 94.7\% of cells.}
 \label{fig:smape}
 \end{figure*}
 

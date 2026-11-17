@@ -86,7 +86,7 @@ A LightGBM model predicts the error of the uncalibrated ResGRU-UNet five-seed en
 | December | 0.9249 | 0.9061 | -0.0188 |
 | Pooled | 0.9193 | 0.9051 | -0.0142 |
 
-Verdict: no gain. RMSE and R² improve slightly, but episode SMAPE rises from 0.235 to 0.305. The hybrid was not submitted to the test set.
+Verdict: no gain. RMSE and R² improve slightly, but episode SMAPE rises from 0.235 to 0.305. Under the rule the hybrid was not eligible for a test submission. After the verdict it was fitted on all four months and scored on the test set once, for the record: 0.8608 private and 0.8775 public, against 0.8838 and 0.8975 for the uncalibrated ensemble (`test_scores.csv`).
 
 ## Ablations
 
