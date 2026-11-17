@@ -15,7 +15,7 @@
 \graphicspath{{figures/}}
 \sisetup{group-minimum-digits=4}
 
-% house style: no em dashes, so the abstract and index-terms headings use a colon
+% abstract and index-terms headings end with a colon
 \makeatletter
 \def\abstract{\normalfont\@IEEEabskeysecsize\bfseries\textit{\abstractname}:\ \relax\@IEEEgobbleleadPARNLSP}
 \def\IEEEkeywords{\vspace{0.4\baselineskip}\normalfont\@IEEEabskeysecsize\bfseries\textit{\IEEEkeywordsname}:\ \relax\@IEEEgobbleleadPARNLSP}
@@ -48,7 +48,8 @@
 Rishihood University\\
 \texttt{vetriselvan.radhakrishnan2024@nst.rishihood.edu.in}}
 
-\markboth{Vetriselvan R: Pipeline Over Backbone}{Vetriselvan R: Pipeline Over Backbone}
+\markboth{}{}
+\hypersetup{pdftitle={Pipeline Over Backbone: A Controlled Study of Deep Networks for PM2.5 Forecasting over India}, pdfauthor={Vetriselvan R}}
 
 \maketitle
 
@@ -933,7 +934,7 @@ The pipeline of Sections~\ref{sec:method} and~\ref{sec:setup} was not designed a
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig_pipeline_evolution.pdf}
-\caption{Held-out test score at each development iteration. The dashed line is persistence (0.7910). Iteration 5 rebuilt the pipeline on an honest split and scored below iteration 4; the rebuilt pipeline overtakes it from iteration 6.}
+\caption{Held-out test score at each development iteration. The dashed line is persistence (0.7910). Iteration 5 rebuilt the pipeline on a leak-free split and scored below iteration 4; the rebuilt pipeline overtakes it from iteration 6.}
 \label{fig:evolution}
 \end{figure*}
 
@@ -991,7 +992,7 @@ ResGRU-UNet, H4 & ablation & 42 & 7{,}126{,}977 & 7 & 0.91456 & 197 & 53 \\
 \end{tabular}
 \end{table}
 
-\textbf{4 to 5: an honest split.} The random split gave an episode correlation near 0.98 for models that scored about 0.86 on the test set: with overlapping windows, it puts near-copies of every validation window into training. Iteration 5 held out the last 15 to 20\% of each month and rebuilt the model as AFNO with a SimVP-style temporal translator \cite{gao2022simvp}. Its best test score, 0.8561, came from a blend with ResGRU-UNet and was below iteration 4. The honest split did not raise the score, but it made model selection reliable. Selection still used the wrong target, however: a proxy episode mask that marked 0.30\% of validation cells against about 2\% for the official one, checkpoints chosen on the validation loss, and no gap between training and validation windows.
+\textbf{4 to 5: a leak-free split.} The random split gave an episode correlation near 0.98 for models that scored about 0.86 on the test set: with overlapping windows, it puts near-copies of every validation window into training. Iteration 5 held out the last 15 to 20\% of each month and rebuilt the model as AFNO with a SimVP-style temporal translator \cite{gao2022simvp}. Its best test score, 0.8561, came from a blend with ResGRU-UNet and was below iteration 4. The leak-free split did not raise the score, but it made model selection reliable. Selection still used the wrong target, however: a proxy episode mask that marked 0.30\% of validation cells against about 2\% for the official one, checkpoints chosen on the validation loss, and no gap between training and validation windows.
 
 \begin{table*}[!t]
 \centering
@@ -1125,7 +1126,7 @@ Total & 68 & all pass \\
 \end{tabular}
 \end{table}
 
-\textbf{6 to 7: physics and calibration (V4).} V4 kept V3's pipeline and addressed that diagnosis with the ventilation, advection, tendency and diurnal-anomaly channels of Section~\ref{sec:physics}, one AFNO block at $35\times31$ for a middle scale \cite{dang2025adaptfno}, lead-hour weights because errors grow with lead time, two seeds, and per-hour calibration fitted on the honest hold-out. Calibration replaced the manual shifts of iterations 3 and 4 with one fitted step, and the physics channels, which had failed when grafted onto trained weights, worked when the network was trained with them from the start. The test score rose by 0.0224 to 0.8833 (Table~\ref{tab:v4steps} splits the gain).
+\textbf{6 to 7: physics and calibration (V4).} V4 kept V3's pipeline and addressed that diagnosis with the ventilation, advection, tendency and diurnal-anomaly channels of Section~\ref{sec:physics}, one AFNO block at $35\times31$ for a middle scale \cite{dang2025adaptfno}, lead-hour weights because errors grow with lead time, two seeds, and per-hour calibration fitted on the leak-free hold-out. Calibration replaced the manual shifts of iterations 3 and 4 with one fitted step, and the physics channels, which had failed when grafted onto trained weights, worked when the network was trained with them from the start. The test score rose by 0.0224 to 0.8833 (Table~\ref{tab:v4steps} splits the gain).
 
 \begin{figure*}[!t]
 \centering
