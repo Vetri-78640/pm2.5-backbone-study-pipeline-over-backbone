@@ -887,6 +887,50 @@ Four extensions remain open: separating the pipeline gain into its parts for eac
 The code is at \url{https://github.com/Vetri-78640/pm2.5-backbone-study-pipeline-over-backbone}: the shared pipeline and every network (\texttt{src/}), the notebook builders and Kaggle tools (\texttt{scripts/}), the dry runs, port check and config test (\texttt{tests/}), six local notebooks with outputs (\texttt{notebooks/}; \texttt{notebooks/kaggle/} holds the Kaggle notebooks exactly as they ran, with their run logs), the study settings (\texttt{configs/}), the run records (\texttt{results/}), the AFNO V4 script and the original notebooks of the ported networks (\texttt{reference/}), and this paper with its figures (\texttt{paper/}). Every table and figure in this paper is built from the files in \texttt{results/}. The data are not included; see \texttt{data/README.md}. The five ResGRU-UNet networks, with their calibration factors and normalization statistics, are at \url{https://www.kaggle.com/models/imvetri0/resgru-unet-pm25}.
 
 \FloatBarrier
+\begin{thebibliography}{99}
+\bibitem{pandey2021} A. Pandey \emph{et al.}, ``Health and economic impact of air pollution in the states of India: The Global Burden of Disease Study 2019,'' \emph{Lancet Planet. Health}, vol. 5, no. 1, pp. e25--e38, 2021.
+\bibitem{grell2005} G. A. Grell, S. E. Peckham, R. Schmitz, S. A. McKeen, G. Frost, W. C. Skamarock, and B. Eder, ``Fully coupled `online' chemistry within the WRF model,'' \emph{Atmos. Environ.}, vol. 39, no. 37, pp. 6957--6975, 2005.
+\bibitem{li2021fno} Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, and A. Anandkumar, ``Fourier neural operator for parametric partial differential equations,'' in \emph{Proc. ICLR}, 2021.
+\bibitem{guibas2022afno} J. Guibas, M. Mardani, Z. Li, A. Tao, A. Anandkumar, and B. Catanzaro, ``Efficient token mixing for transformers via adaptive Fourier neural operators,'' in \emph{Proc. ICLR}, 2022.
+\bibitem{shi2015convlstm} X. Shi, Z. Chen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Convolutional LSTM network: A machine learning approach for precipitation nowcasting,'' in \emph{Proc. NeurIPS}, 2015, pp. 802--810.
+\bibitem{ballas2016convgru} N. Ballas, L. Yao, C. Pal, and A. Courville, ``Delving deeper into convolutional networks for learning video representations,'' in \emph{Proc. ICLR}, 2016.
+\bibitem{wightman2021} R. Wightman, H. Touvron, and H. J\'{e}gou, ``ResNet strikes back: An improved training procedure in timm,'' arXiv:2110.00476, 2021.
+\bibitem{bello2021} I. Bello, W. Fedus, X. Du, E. D. Cubuk, A. Srinivas, T.-Y. Lin, J. Shlens, and B. Zoph, ``Revisiting ResNets: Improved training and scaling strategies,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 34, 2021.
+\bibitem{liu2022convnext} Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie, ``A ConvNet for the 2020s,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2022, pp. 11976--11986.
+\bibitem{zeng2023} A. Zeng, M. Chen, L. Zhang, and Q. Xu, ``Are transformers effective for time series forecasting?'' in \emph{Proc. AAAI Conf. Artif. Intell.}, vol. 37, no. 9, 2023, pp. 11121--11128.
+\bibitem{kushwaha2025} A. Kushwaha and K. Gopalan, ``A comparison of lightweight deep learning models for particulate-matter nowcasting in the Indian subcontinent \& surrounding regions,'' arXiv:2511.11185, 2025.
+\bibitem{bedi2025conoair} S. Bedi, K. Tiwari, Prathosh A. P., S. H. Kota, N. M. A. Krishnan \emph{et al.}, ``CoNOAir: A neural operator for forecasting carbon monoxide evolution in cities,'' arXiv:2501.06007, 2025.
+\bibitem{pathak2022fourcastnet} J. Pathak \emph{et al.}, ``FourCastNet: A global data-driven high-resolution weather model using adaptive Fourier neural operators,'' arXiv:2202.11214, 2022.
+\bibitem{dang2025adaptfno} H. V. Dang, B. D. G. Nguyen, P. C. H. Nguyen, and T.-S. Hy, ``AdaptFNO: Adaptive Fourier neural operator with dynamic spectral modes and multiscale learning for climate modeling,'' in \emph{NeurIPS Workshop on Machine Learning and the Physical Sciences}, 2025.
+\bibitem{shi2017trajgru} X. Shi, Z. Gao, L. Lausen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Deep learning for precipitation nowcasting: A benchmark and a new model,'' in \emph{Proc. NeurIPS}, 2017.
+\bibitem{ronneberger2015unet} O. Ronneberger, P. Fischer, and T. Brox, ``U-Net: Convolutional networks for biomedical image segmentation,'' in \emph{Proc. MICCAI}, 2015, pp. 234--241.
+\bibitem{he2016} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. CVPR}, 2016, pp. 770--778.
+\bibitem{gao2022simvp} Z. Gao, C. Tan, L. Wu, and S. Z. Li, ``SimVP: Simpler yet better video prediction,'' in \emph{Proc. CVPR}, 2022, pp. 3170--3180.
+\bibitem{leinonen2021} J. Leinonen, ``Spatiotemporal weather data predictions with shortcut recurrent-convolutional networks: A solution for the Weather4cast challenge,'' arXiv:2111.02121, 2021.
+\bibitem{melis2018} G. Melis, C. Dyer, and P. Blunsom, ``On the state of the art of evaluation in neural language models,'' in \emph{Proc. ICLR}, 2018.
+\bibitem{lucic2018} M. Lucic, K. Kurach, M. Michalski, S. Gelly, and O. Bousquet, ``Are GANs created equal? A large-scale study,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 31, 2018, pp. 700--709.
+\bibitem{gneiting2011} T. Gneiting, ``Making and evaluating point forecasts,'' \emph{J. Amer. Statist. Assoc.}, vol. 106, no. 494, pp. 746--762, 2011.
+\bibitem{goodwin1999} P. Goodwin and R. Lawton, ``On the asymmetry of the symmetric MAPE,'' \emph{Int. J. Forecast.}, vol. 15, no. 4, pp. 405--408, 1999.
+\bibitem{roberts2017} D. R. Roberts \emph{et al.}, ``Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure,'' \emph{Ecography}, vol. 40, no. 8, pp. 913--929, 2017.
+\bibitem{kaufman2012} S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, ``Leakage in data mining: Formulation, detection, and avoidance,'' \emph{ACM Trans. Knowl. Discov. Data}, vol. 6, no. 4, Art. no. 15, 2012.
+\bibitem{kunsch1989} H. R. K\"{u}nsch, ``The jackknife and the bootstrap for general stationary observations,'' \emph{Ann. Statist.}, vol. 17, no. 3, pp. 1217--1241, 1989.
+\bibitem{bouthillier2021} X. Bouthillier \emph{et al.}, ``Accounting for variance in machine learning benchmarks,'' in \emph{Proc. Mach. Learn. Syst. (MLSys)}, vol. 3, 2021.
+\bibitem{hyndman2021} R. J. Hyndman and G. Athanasopoulos, \emph{Forecasting: Principles and Practice}, 3rd ed. Melbourne, Australia: OTexts, 2021.
+\bibitem{hoerl1970} A. E. Hoerl and R. W. Kennard, ``Ridge regression: Biased estimation for nonorthogonal problems,'' \emph{Technometrics}, vol. 12, no. 1, pp. 55--67, 1970.
+\bibitem{loshchilov2019} I. Loshchilov and F. Hutter, ``Decoupled weight decay regularization,'' in \emph{Proc. ICLR}, 2019.
+\bibitem{smith2019} L. N. Smith and N. Topin, ``Super-convergence: Very fast training of neural networks using large learning rates,'' in \emph{Proc. SPIE}, vol. 11006, 2019.
+\bibitem{wu2018} Y. Wu and K. He, ``Group normalization,'' in \emph{Proc. ECCV}, 2018, pp. 3--19.
+\bibitem{polyak1992} B. T. Polyak and A. B. Juditsky, ``Acceleration of stochastic approximation by averaging,'' \emph{SIAM J. Control Optim.}, vol. 30, no. 4, pp. 838--855, 1992.
+\bibitem{lakshminarayanan2017} B. Lakshminarayanan, A. Pritzel, and C. Blundell, ``Simple and scalable predictive uncertainty estimation using deep ensembles,'' in \emph{Proc. NeurIPS}, 2017, pp. 6402--6413.
+\bibitem{ke2017lightgbm} G. Ke \emph{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 30, 2017, pp. 3146--3154.
+\bibitem{aisehack2026} ANRF AISEHack 2026, Phase 2, Theme 2: pollution forecasting (IIT Delhi), Kaggle, 2026. [Online]. Available: \url{https://www.kaggle.com/competitions/anrf-aise-hack-phase-2-theme-2-pollution-forecasting-iitd}
+\bibitem{cleveland1990} R. B. Cleveland, W. S. Cleveland, J. E. McRae, and I. Terpenning, ``STL: A seasonal-trend decomposition procedure based on loess,'' \emph{J. Off. Stat.}, vol. 6, no. 1, pp. 3--73, 1990.
+\bibitem{iyer2013} U. S. Iyer and P. E. Raj, ``Ventilation coefficient trends in the recent decades over four major Indian metropolitan cities,'' \emph{J. Earth Syst. Sci.}, vol. 122, no. 2, pp. 537--549, 2013.
+\bibitem{staniforth1991} A. Staniforth and J. C\^{o}t\'{e}, ``Semi-Lagrangian integration schemes for atmospheric models: A review,'' \emph{Mon. Weather Rev.}, vol. 119, no. 9, pp. 2206--2223, 1991.
+\bibitem{koenker1978} R. Koenker and G. Bassett Jr., ``Regression quantiles,'' \emph{Econometrica}, vol. 46, no. 1, pp. 33--50, 1978.
+\end{thebibliography}
+
+\onecolumn
 \appendices
 \raggedbottom
 
@@ -913,12 +957,11 @@ Test inputs (2017) & 34.5 & 16.9 & 232 & 1519 \\
 
 The memory of the field fades over the horizon. The autocorrelation of $\log(1+y)$ is 0.978 at a lag of one hour, 0.728 at 6 hours, 0.535 at 12 hours and 0.571 at 24 hours, where the daily cycle brings it back up. The standard deviation of its change grows from 0.101 after one hour to 0.286, 0.419, 0.485 and 0.505 after 4, 8, 12 and 16 hours. The mean 10-m wind is 4.24~m/s and its RMS 4.97~m/s, so \PM{} travels 244 to 286~km in 16 hours, or 9.8 to 11.5 cells. In the April files, the emission fields are nonzero in 4\% (biomass-burning NMVOC) to 98\% of cell-hours, with maxima from $8\times10^{-9}$ to $7\times10^{-6}$; at that scale and without stated units they were left out.
 
-\FloatBarrier
 \section{Development History}
 \label{sec:history}
 The pipeline of Sections~\ref{sec:method} and~\ref{sec:setup} was not designed at once. It grew over seven iterations, each started by a problem that the previous one exposed; the controlled study is iteration 8. Table~\ref{tab:iterations} lists each move and its reason, and Fig.~\ref{fig:evolution} shows the test score. Iterations 1 to 4 were chosen on a random validation split, which leaked (Section~\ref{sec:setup}), and on feedback from the public part of the test set, so only their test scores are comparable.
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \centering
 \caption{Development iterations: what changed, why, and the held-out test score}
 \label{tab:iterations}
@@ -936,14 +979,14 @@ The pipeline of Sections~\ref{sec:method} and~\ref{sec:setup} was not designed a
 8 & ResGRU-UNet in the V4 pipeline, 5 seeds, calibration & compare networks with the pipeline fixed & \textbf{0.8914} \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{fig_pipeline_evolution.pdf}
 \caption{Held-out test score at each development iteration. The dashed line is persistence (0.7910). Iteration 5 rebuilt the pipeline on a leak-free split and scored below iteration 4; the rebuilt pipeline overtakes it from iteration 6.}
 \label{fig:evolution}
-\end{figure*}
+\end{figure}
 
 \textbf{1 to 2: from patch AFNO to ResGRU-UNet.} The first models followed FourCastNet: AFNO on $4\times4$ patches, trained on a random split. They stalled below 0.83 on the test set. We attributed this to the global spectral layers acting as low-pass filters that blurred sharp spikes, and moved to a U-Net with full-resolution skips for local detail, a ConvGRU, and an output added to the last observed hour. The score rose to 0.8506. Later checks showed that this explanation was wrong. The patch model's spectral step applied the same complex matrix at every frequency, so apart from its soft threshold it was almost linear and local; a bug also discarded the imaginary half of every filtered spectrum; and each $4\times4$ patch was rebuilt by one linear layer with no skips. Three things had changed at once (the persistence residual, the skips and a log-space loss), and persistence alone is already strong.
 
@@ -951,7 +994,18 @@ The pipeline of Sections~\ref{sec:method} and~\ref{sec:setup} was not designed a
 
 \textbf{4 to 5: a leak-free split.} The random split gave an episode correlation near 0.98 for models that scored about 0.86 on the test set: with overlapping windows, it puts near-copies of every validation window into training. Iteration 5 held out the last 15 to 20\% of each month and rebuilt the model as AFNO with a SimVP-style temporal translator \cite{gao2022simvp}. Its best test score, 0.8561, came from a blend with ResGRU-UNet and was below iteration 4. The leak-free split did not raise the score, but it made model selection reliable. Selection still used the wrong target, however: a proxy episode mask that marked 0.30\% of validation cells against about 2\% for the official one, checkpoints chosen on the validation loss, and no gap between training and validation windows.
 
-\begin{table*}[!t]
+\textbf{5 to 6: validation equal to the metric (V3).} V3 rewrote the pipeline so that validation measures exactly what the test measures: the official robust STL episodes, the exact score for choosing checkpoints, a 12-hour gap, per-cell normalization, a lead-hour embedding and weight averaging. It also fixed a hidden mismatch: the ResGRU-UNet models had been trained with the true hour of day but given hours 0 to 9 for every test window. In V3, training keeps the true hour, while validation and test windows get the estimated hour of Section~\ref{sec:physics}, so validation sees the same hour noise as the test. As one model with no blend, V3 reached 0.8609. Its validation also revealed a trade-off that the earlier pipelines could not show: global SMAPE kept improving after epoch 4 while episode SMAPE got worse.
+
+\textbf{6 to 7: physics and calibration (V4).} V4 kept V3's pipeline and addressed that diagnosis with the ventilation, advection, tendency and diurnal-anomaly channels of Section~\ref{sec:physics}, one AFNO block at $35\times31$ for a middle scale \cite{dang2025adaptfno}, lead-hour weights because errors grow with lead time, two seeds, and per-hour calibration fitted on the leak-free hold-out. Calibration replaced the manual shifts of iterations 3 and 4 with one fitted step, and the physics channels, which had failed when grafted onto trained weights, worked when the network was trained with them from the start. The test score rose by 0.0224 to 0.8833 (Table~\ref{tab:v4steps} splits the gain).
+
+\textbf{7 to 8: one pipeline for every network.} V4 was the best model, but its pipeline had changed together with its network: split, masks, inputs, loss, hour handling and post-processing. The other networks had been trained in older, leakier pipelines, so their scores could not be compared with V4's. We therefore moved every network into V4's pipeline. Each was ported unchanged except for its input width (20 channels); ConvLSTM and patch AFNO also received the residual output with a zero-initialized last layer, ConvLSTM lost its season input, and patch AFNO got its bug fix. Each port was checked against its original (Section~\ref{sec:arch}). Each round-one notebook first re-evaluated the original AFNO V4 checkpoint on its own validation set and would have stopped unless it reproduced the logged 0.9110; it did, to five decimals. The windows, masks, loss, recipe and seed are then the same for every network, so the network is the only difference. Table~\ref{tab:samepipe} shows what the pipeline alone did for the three networks whose original runs are known: each gained 0.025 to 0.031 on the test set.
+
+\section{Architecture and Training Details}
+\label{app:arch}\label{app:runs}\label{app:cost}
+\subsection{Layers}
+Table~\ref{tab:archdetail} lists the layers of the five networks as they ran in the study. All five end in the persistence residual: the predicted change is added to $\log(1+y_t)$, and the last layer starts at zero. ConvBlock denotes two $3\times3$ convolutions with GroupNorm and GELU, channel dropout between them, and a residual connection; the same block is used in AFNO V4, ResGRU-UNet and FMG-WACLU.
+
+\begin{table}[!htbp]
 \centering
 \caption{Layers of the five networks (study versions)}
 \label{tab:archdetail}
@@ -971,18 +1025,7 @@ ConvLSTM & 20 channels plus the \PM{} map shifted along the wind by bilinear sam
 patch AFNO & 10 hours stacked; $4\times4$ patch embedding to 256 dimensions; $35{\times}31$ tokens with a learned position embedding & none & eight spectral blocks (4 heads; one complex matrix per head shared by all frequencies; MLP ratio 4; dropout 0.1) & linear projection of each token to $16\times4\times4$ values, then unpatchify \\
 \bottomrule
 \end{tabular}
-\end{table*}
-
-\textbf{5 to 6: validation equal to the metric (V3).} V3 rewrote the pipeline so that validation measures exactly what the test measures: the official robust STL episodes, the exact score for choosing checkpoints, a 12-hour gap, per-cell normalization, a lead-hour embedding and weight averaging. It also fixed a hidden mismatch: the ResGRU-UNet models had been trained with the true hour of day but given hours 0 to 9 for every test window. In V3, training keeps the true hour, while validation and test windows get the estimated hour of Section~\ref{sec:physics}, so validation sees the same hour noise as the test. As one model with no blend, V3 reached 0.8609. Its validation also revealed a trade-off that the earlier pipelines could not show: global SMAPE kept improving after epoch 4 while episode SMAPE got worse.
-
-\textbf{6 to 7: physics and calibration (V4).} V4 kept V3's pipeline and addressed that diagnosis with the ventilation, advection, tendency and diurnal-anomaly channels of Section~\ref{sec:physics}, one AFNO block at $35\times31$ for a middle scale \cite{dang2025adaptfno}, lead-hour weights because errors grow with lead time, two seeds, and per-hour calibration fitted on the leak-free hold-out. Calibration replaced the manual shifts of iterations 3 and 4 with one fitted step, and the physics channels, which had failed when grafted onto trained weights, worked when the network was trained with them from the start. The test score rose by 0.0224 to 0.8833 (Table~\ref{tab:v4steps} splits the gain).
-
-\textbf{7 to 8: one pipeline for every network.} V4 was the best model, but its pipeline had changed together with its network: split, masks, inputs, loss, hour handling and post-processing. The other networks had been trained in older, leakier pipelines, so their scores could not be compared with V4's. We therefore moved every network into V4's pipeline. Each was ported unchanged except for its input width (20 channels); ConvLSTM and patch AFNO also received the residual output with a zero-initialized last layer, ConvLSTM lost its season input, and patch AFNO got its bug fix. Each port was checked against its original (Section~\ref{sec:arch}). Each round-one notebook first re-evaluated the original AFNO V4 checkpoint on its own validation set and would have stopped unless it reproduced the logged 0.9110; it did, to five decimals. The windows, masks, loss, recipe and seed are then the same for every network, so the network is the only difference. Table~\ref{tab:samepipe} shows what the pipeline alone did for the three networks whose original runs are known: each gained 0.025 to 0.031 on the test set.
-
-\section{Architecture and Training Details}
-\label{app:arch}\label{app:runs}\label{app:cost}
-\subsection{Layers}
-Table~\ref{tab:archdetail} lists the layers of the five networks as they ran in the study. All five end in the persistence residual: the predicted change is added to $\log(1+y_t)$, and the last layer starts at zero. ConvBlock denotes two $3\times3$ convolutions with GroupNorm and GELU, channel dropout between them, and a residual connection; the same block is used in AFNO V4, ResGRU-UNet and FMG-WACLU.
+\end{table}
 
 \subsection{Training Runs}
 Table~\ref{tab:runs} lists the 15 training runs of the study. AFNO V4 seeds 42 and 1337 come from the V4 run and were re-evaluated, not retrained. Every run first reproduced the V4 checkpoint's validation score (Section~\ref{sec:verify}), and every run completed all 16 epochs on one NVIDIA T4 with PyTorch 2.11.
@@ -1035,13 +1078,12 @@ ConvLSTM step & $Nk^2(d_x+d_h)\,4d_h$ & $+(k-1)/2$ cells \\
 \end{tabular}
 \end{table}
 
-\FloatBarrier
 \section{Full Results}
 \label{app:regfull}\label{app:tests}\label{app:checks}\label{app:extra}
 \subsection{Regression Metrics}
 Table~\ref{tab:regfull} gives the validation metrics of every model on the raw scale and in $\log(1+y)$, with the Pearson correlation $r$ over all values. The log-space $R^2$ orders the finalists as the raw one does (0.952 against 0.944 for the five-seed ensembles).
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \centering
 \caption{Validation metrics of every model: raw scale (MAE, RMSE in \ugm), log space, pooled correlation $r$, skill (\%) and benchmark score $S$}
 \label{tab:regfull}
@@ -1090,12 +1132,9 @@ ResGRU-UNet, 5 seeds & 6.32 & 18.04 & 0.892 & 0.169 & 0.273 & 0.952 & 0.951 & 31
 \ + cal., one month out & 7.12 & 19.71 & 0.871 & 0.183 & 0.290 & 0.946 & 0.949 & 25.5 & 0.9210 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-\subsection{Every Test Score}
-Table~\ref{tab:tests} lists every forecast of the study that was scored on the test set, with the scores of both parts. The first three rows score V4's own forecasts, so that the study's numbers for AFNO V4 come from the same server as the rest. Wherever both finalists have a score at the same setting, the public and private parts order them the same way.
-
-\begin{table*}[!t]
+\begin{table}[!tp]
 \centering
 \caption{Every test score of the study (UTC date of scoring; the description as recorded at submission)}
 \label{tab:tests}
@@ -1133,12 +1172,15 @@ Date & Forecast & Public & Private (test) \\
 2026-11-16 & post hoc: ResGRU-UNet 5-seed mean $+$ LightGBM correction fitted on all 4 val months, no calibration, out-of-fold val 0.9051 (rule verdict: no gain) & 0.8775 & 0.8608 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
+
+\subsection{Every Test Score}
+Table~\ref{tab:tests} lists every forecast of the study that was scored on the test set, with the scores of both parts. The first three rows score V4's own forecasts, so that the study's numbers for AFNO V4 come from the same server as the rest. Wherever both finalists have a score at the same setting, the public and private parts order them the same way.
 
 \subsection{Automated Checks}
 Each analysis stage writes its checks into its run record, and the record is kept only if they pass. Table~\ref{tab:checks} counts them; all 68 pass. They fall into four kinds: recomputed scores equal the logged ones (for example, each seed's validation score, the five-seed ensembles and the two-seed calibration); test forecasts equal the training run's own output (relative difference below $10^{-3}$); identities that must hold (zero ridge weights give persistence; a zero hybrid correction gives the ensemble; the truth scored against itself gives MAE 0, RMSE 0 and $R^2$ 1); and data checks (shapes, finite and non-negative forecasts, no month fitted on itself).
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Automated checks in the run records}
 \label{tab:checks}
@@ -1163,7 +1205,7 @@ Total & 68 & all pass \\
 \subsection{Additional Results}
 Table~\ref{tab:deciles} splits the SMAPE of the two ensembles by how polluted a cell is, Fig.~\ref{fig:terms} splits the score into its three terms by lead hour, Fig.~\ref{fig:case} shows one window in detail, and Fig.~\ref{fig:smape} maps the SMAPE of both ensembles.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Mean SMAPE of the five-seed ensembles in each decile of cells, ranked by mean \PM{} (\ugm)}
 \label{tab:deciles}
@@ -1186,68 +1228,25 @@ Decile & Cell mean & AFNO V4 & ResGRU-UNet & Difference \\
 \end{tabular}
 \end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{fig_terms_by_hour.pdf}
 \caption{The three terms of the benchmark score and the score itself by lead hour, on validation. Thin lines: single seeds; thick lines: five-seed means.}
 \label{fig:terms}
-\end{figure*}
+\end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[!htbp]
 \centering
-\includegraphics[width=\columnwidth, trim=155 79 194 71, clip]{fig_case.png}
+\includegraphics[width=0.62\textwidth, trim=155 79 194 71, clip]{fig_case.png}
 \caption{The validation window with the most episode cells (December): truth with episode cells outlined (top), AFNO V4 (middle) and ResGRU-UNet (bottom) at lead hours 1, 6, 11 and 16, in grid coordinates on a log colour scale. Both smooth the episode structure; ResGRU-UNet scores higher on this window (0.9116 against 0.9103) but has the lower episode correlation (0.928 against 0.944).}
 \label{fig:case}
 \end{figure}
 
-\begin{figure*}[!t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{fig_smape_maps.pdf}
 \caption{Mean SMAPE per cell for the five-seed means of AFNO V4 (a) and ResGRU-UNet (b), and their difference (c). ResGRU-UNet is lower in 94.7\% of cells.}
 \label{fig:smape}
-\end{figure*}
-
-\begin{thebibliography}{99}
-\bibitem{pandey2021} A. Pandey \emph{et al.}, ``Health and economic impact of air pollution in the states of India: The Global Burden of Disease Study 2019,'' \emph{Lancet Planet. Health}, vol. 5, no. 1, pp. e25--e38, 2021.
-\bibitem{grell2005} G. A. Grell, S. E. Peckham, R. Schmitz, S. A. McKeen, G. Frost, W. C. Skamarock, and B. Eder, ``Fully coupled `online' chemistry within the WRF model,'' \emph{Atmos. Environ.}, vol. 39, no. 37, pp. 6957--6975, 2005.
-\bibitem{li2021fno} Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, and A. Anandkumar, ``Fourier neural operator for parametric partial differential equations,'' in \emph{Proc. ICLR}, 2021.
-\bibitem{guibas2022afno} J. Guibas, M. Mardani, Z. Li, A. Tao, A. Anandkumar, and B. Catanzaro, ``Efficient token mixing for transformers via adaptive Fourier neural operators,'' in \emph{Proc. ICLR}, 2022.
-\bibitem{shi2015convlstm} X. Shi, Z. Chen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Convolutional LSTM network: A machine learning approach for precipitation nowcasting,'' in \emph{Proc. NeurIPS}, 2015, pp. 802--810.
-\bibitem{ballas2016convgru} N. Ballas, L. Yao, C. Pal, and A. Courville, ``Delving deeper into convolutional networks for learning video representations,'' in \emph{Proc. ICLR}, 2016.
-\bibitem{wightman2021} R. Wightman, H. Touvron, and H. J\'{e}gou, ``ResNet strikes back: An improved training procedure in timm,'' arXiv:2110.00476, 2021.
-\bibitem{bello2021} I. Bello, W. Fedus, X. Du, E. D. Cubuk, A. Srinivas, T.-Y. Lin, J. Shlens, and B. Zoph, ``Revisiting ResNets: Improved training and scaling strategies,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 34, 2021.
-\bibitem{liu2022convnext} Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie, ``A ConvNet for the 2020s,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2022, pp. 11976--11986.
-\bibitem{zeng2023} A. Zeng, M. Chen, L. Zhang, and Q. Xu, ``Are transformers effective for time series forecasting?'' in \emph{Proc. AAAI Conf. Artif. Intell.}, vol. 37, no. 9, 2023, pp. 11121--11128.
-\bibitem{kushwaha2025} A. Kushwaha and K. Gopalan, ``A comparison of lightweight deep learning models for particulate-matter nowcasting in the Indian subcontinent \& surrounding regions,'' arXiv:2511.11185, 2025.
-\bibitem{bedi2025conoair} S. Bedi, K. Tiwari, Prathosh A. P., S. H. Kota, N. M. A. Krishnan \emph{et al.}, ``CoNOAir: A neural operator for forecasting carbon monoxide evolution in cities,'' arXiv:2501.06007, 2025.
-\bibitem{pathak2022fourcastnet} J. Pathak \emph{et al.}, ``FourCastNet: A global data-driven high-resolution weather model using adaptive Fourier neural operators,'' arXiv:2202.11214, 2022.
-\bibitem{dang2025adaptfno} H. V. Dang, B. D. G. Nguyen, P. C. H. Nguyen, and T.-S. Hy, ``AdaptFNO: Adaptive Fourier neural operator with dynamic spectral modes and multiscale learning for climate modeling,'' in \emph{NeurIPS Workshop on Machine Learning and the Physical Sciences}, 2025.
-\bibitem{shi2017trajgru} X. Shi, Z. Gao, L. Lausen, H. Wang, D.-Y. Yeung, W.-k. Wong, and W.-c. Woo, ``Deep learning for precipitation nowcasting: A benchmark and a new model,'' in \emph{Proc. NeurIPS}, 2017.
-\bibitem{ronneberger2015unet} O. Ronneberger, P. Fischer, and T. Brox, ``U-Net: Convolutional networks for biomedical image segmentation,'' in \emph{Proc. MICCAI}, 2015, pp. 234--241.
-\bibitem{he2016} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. CVPR}, 2016, pp. 770--778.
-\bibitem{gao2022simvp} Z. Gao, C. Tan, L. Wu, and S. Z. Li, ``SimVP: Simpler yet better video prediction,'' in \emph{Proc. CVPR}, 2022, pp. 3170--3180.
-\bibitem{leinonen2021} J. Leinonen, ``Spatiotemporal weather data predictions with shortcut recurrent-convolutional networks: A solution for the Weather4cast challenge,'' arXiv:2111.02121, 2021.
-\bibitem{melis2018} G. Melis, C. Dyer, and P. Blunsom, ``On the state of the art of evaluation in neural language models,'' in \emph{Proc. ICLR}, 2018.
-\bibitem{lucic2018} M. Lucic, K. Kurach, M. Michalski, S. Gelly, and O. Bousquet, ``Are GANs created equal? A large-scale study,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 31, 2018, pp. 700--709.
-\bibitem{gneiting2011} T. Gneiting, ``Making and evaluating point forecasts,'' \emph{J. Amer. Statist. Assoc.}, vol. 106, no. 494, pp. 746--762, 2011.
-\bibitem{goodwin1999} P. Goodwin and R. Lawton, ``On the asymmetry of the symmetric MAPE,'' \emph{Int. J. Forecast.}, vol. 15, no. 4, pp. 405--408, 1999.
-\bibitem{roberts2017} D. R. Roberts \emph{et al.}, ``Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure,'' \emph{Ecography}, vol. 40, no. 8, pp. 913--929, 2017.
-\bibitem{kaufman2012} S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, ``Leakage in data mining: Formulation, detection, and avoidance,'' \emph{ACM Trans. Knowl. Discov. Data}, vol. 6, no. 4, Art. no. 15, 2012.
-\bibitem{kunsch1989} H. R. K\"{u}nsch, ``The jackknife and the bootstrap for general stationary observations,'' \emph{Ann. Statist.}, vol. 17, no. 3, pp. 1217--1241, 1989.
-\bibitem{bouthillier2021} X. Bouthillier \emph{et al.}, ``Accounting for variance in machine learning benchmarks,'' in \emph{Proc. Mach. Learn. Syst. (MLSys)}, vol. 3, 2021.
-\bibitem{hyndman2021} R. J. Hyndman and G. Athanasopoulos, \emph{Forecasting: Principles and Practice}, 3rd ed. Melbourne, Australia: OTexts, 2021.
-\bibitem{hoerl1970} A. E. Hoerl and R. W. Kennard, ``Ridge regression: Biased estimation for nonorthogonal problems,'' \emph{Technometrics}, vol. 12, no. 1, pp. 55--67, 1970.
-\bibitem{loshchilov2019} I. Loshchilov and F. Hutter, ``Decoupled weight decay regularization,'' in \emph{Proc. ICLR}, 2019.
-\bibitem{smith2019} L. N. Smith and N. Topin, ``Super-convergence: Very fast training of neural networks using large learning rates,'' in \emph{Proc. SPIE}, vol. 11006, 2019.
-\bibitem{wu2018} Y. Wu and K. He, ``Group normalization,'' in \emph{Proc. ECCV}, 2018, pp. 3--19.
-\bibitem{polyak1992} B. T. Polyak and A. B. Juditsky, ``Acceleration of stochastic approximation by averaging,'' \emph{SIAM J. Control Optim.}, vol. 30, no. 4, pp. 838--855, 1992.
-\bibitem{lakshminarayanan2017} B. Lakshminarayanan, A. Pritzel, and C. Blundell, ``Simple and scalable predictive uncertainty estimation using deep ensembles,'' in \emph{Proc. NeurIPS}, 2017, pp. 6402--6413.
-\bibitem{ke2017lightgbm} G. Ke \emph{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol. 30, 2017, pp. 3146--3154.
-\bibitem{aisehack2026} ANRF AISEHack 2026, Phase 2, Theme 2: pollution forecasting (IIT Delhi), Kaggle, 2026. [Online]. Available: \url{https://www.kaggle.com/competitions/anrf-aise-hack-phase-2-theme-2-pollution-forecasting-iitd}
-\bibitem{cleveland1990} R. B. Cleveland, W. S. Cleveland, J. E. McRae, and I. Terpenning, ``STL: A seasonal-trend decomposition procedure based on loess,'' \emph{J. Off. Stat.}, vol. 6, no. 1, pp. 3--73, 1990.
-\bibitem{iyer2013} U. S. Iyer and P. E. Raj, ``Ventilation coefficient trends in the recent decades over four major Indian metropolitan cities,'' \emph{J. Earth Syst. Sci.}, vol. 122, no. 2, pp. 537--549, 2013.
-\bibitem{staniforth1991} A. Staniforth and J. C\^{o}t\'{e}, ``Semi-Lagrangian integration schemes for atmospheric models: A review,'' \emph{Mon. Weather Rev.}, vol. 119, no. 9, pp. 2206--2223, 1991.
-\bibitem{koenker1978} R. Koenker and G. Bassett Jr., ``Regression quantiles,'' \emph{Econometrica}, vol. 46, no. 1, pp. 33--50, 1978.
-\end{thebibliography}
-
+\end{figure}
+\FloatBarrier
 \end{document}
